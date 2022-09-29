@@ -10,5 +10,5 @@ setuptools.setup(
     long_description="This is a project meant to express the Discord Types as Python Classes and "
                      "build bots using exclusively the interactions features",
     author="SilicalNZ@gmail.com",
-    packages=["DiscordInterpythons"],
+    packages=["DiscordInterpythons.abcs", "DiscordInterpythons.handlers", "DiscordInterpythons.models", "DiscordInterpythons.providers"],
 )

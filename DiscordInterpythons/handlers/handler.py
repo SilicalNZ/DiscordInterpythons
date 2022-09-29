@@ -231,16 +231,3 @@ def doc_parser(doc_string: str) -> tuple[str, dict[str, str]]:
             params[key.split(" ")[-1]] = value
 
     return short_description, params
-
-
-class NewCommands(InteractionHandlerClass):
-    @InteractionHandler()
-    async def ping(self, interaction: models.Interaction):
-        return "Pong"
-
-    @InteractionHandler
-    async def
-
-
-
-
