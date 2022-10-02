@@ -14,7 +14,7 @@ _BASE_URL = "https://discord.com/api/v8/webhooks"
 
 
 @dataclass
-class WebhookAuthABC(abc.WebhookAuthABC):
+class WebhookAuthAPI(abc.WebhookAuthABC):
     async def _request(
             self,
             *,
@@ -106,7 +106,7 @@ class WebhookAuthABC(abc.WebhookAuthABC):
 
 
 @dataclass
-class WebhookABC(abc.WebhookABC):
+class WebhookAPI(abc.WebhookABC):
     async def _request(
             self,
             *,

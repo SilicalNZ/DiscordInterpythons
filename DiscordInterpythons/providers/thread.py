@@ -7,7 +7,7 @@ from DiscordInterpythons import models
 
 
 @dataclass
-class Thread(metaclass=abc.ABCMeta):
+class ThreadAPI(metaclass=abc.ABCMeta):
     channel_id: models.ChannelID
 
     # https://discord.com/developers/docs/resources/channel#join-thread

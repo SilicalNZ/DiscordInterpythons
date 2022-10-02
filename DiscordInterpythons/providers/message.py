@@ -14,7 +14,7 @@ _BASE_URL = "https://discord.com/api/v9"
 
 
 @dataclass
-class Message(abc.MessageABC):
+class MessageAPI(abc.MessageABC):
     channel_id: models.ChannelID
     message_id: models.MessageID
 

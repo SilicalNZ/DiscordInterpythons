@@ -28,7 +28,7 @@ class InteractionCallbackData(_BaseModel):
     attachments: None | Attachment.S = None
 
 
-class InterationResponse(_BaseModel):
+class InteractionResponse(_BaseModel):
     type: InteractionResponseType = None
     data: None | InteractionCallbackData = None
 

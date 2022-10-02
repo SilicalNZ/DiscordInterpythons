@@ -4,6 +4,7 @@ import aiohttp
 import asyncio
 import json
 
+from DiscordInterpythons.handlers import InteractionHandlerClass
 from DiscordInterpythons.abcs import models as discord_model
 from DiscordInterpythons.abcs import application_command as abcs
 
@@ -13,11 +14,25 @@ class DiscordToken(str):
 
 
 @dataclass
-class DiscordApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
+class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
     token: DiscordToken
     application_id: discord_model.ApplicationID
     debug_guild_id: None | discord_model.GuildID
     local_application_commands: abcs.ApplicationCommand.S
+
+    @classmethod
+    def from_interaction_handler_class(
+            cls,
+            token: DiscordToken,
+            application_id: None | discord_model.ApplicationID,
+            debug_guild_id: None | discord_model.GuildID,
+    ):
+        return cls(
+            token=token,
+            application_id=application_id,
+            debug_guild_id=debug_guild_id,
+            local_application_commands=InteractionHandlerClass.generate_application_commands(),
+        )
 
     @property
     def _base_endpoint(self) -> str:
@@ -49,7 +64,7 @@ class DiscordApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
                 }) as session:
             async with session.get(url) as resp:
                 result = await resp.json()
-                return abcs.ApplicationCommand.cast_from_array(result)
+                return tuple(abcs.ApplicationCommand(**i) for i in result)
 
     async def delete_application(self, application: abcs.ApplicationCommand):
         url = f"{self._base_endpoint}/{application.id}"
@@ -62,17 +77,17 @@ class DiscordApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
         url = self._base_endpoint
 
         async with aiohttp.ClientSession(headers={**self._header_auth, **self._header_content_type}) as session:
-            async with session.post(url, data=json.dumps(application.to_dict())):
+            async with session.post(url, data=json.dumps(application.dict())):
                 pass
 
     async def initialize(self):
-        check_deletion_foreign_application_commands = await self.get_applications()
+        check_deletion_foreign_application_commands = await self.read_applications()
 
         foreign_application_commands: tuple[abcs.ApplicationCommand, ...] = ()
         for foreign_application_command in check_deletion_foreign_application_commands:
             if self._foreign_application_command_should_be_deleted(foreign_application_command):
                 await self.delete_application(foreign_application_command)
-                await asyncio.sleep(5)
+                await asyncio.sleep(5)  # Arbitrary... should be something smarter
             else:
                 foreign_application_commands = (*foreign_application_commands, foreign_application_command)
 

@@ -35,16 +35,26 @@ class _InteractionHandlerMetaClass(type):
             i.parent_self = inst
 
     @classmethod
-    async def call(mcs, interaction: models.Interaction):
+    async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
         handler = mcs._command_storage.get(interaction.data.name)
 
         assert handler
 
         return await handler._call(interaction)
 
+    @classmethod
+    def generate_application_commands(mcs) -> models.ApplicationCommand.S:
+        application_commands: list[models.ApplicationCommand] = []
+
+        for key, value in mcs._command_storage.items():
+            application_commands.append(value._generate_application_command())
+
+        return tuple(application_commands)
+
 
 class InteractionHandlerClass(metaclass=_InteractionHandlerMetaClass):
-    pass
+    def __init__(self):
+        _InteractionHandlerMetaClass.register_handler(self)
 
 
 class InteractionHandler:
@@ -83,7 +93,7 @@ class InteractionHandler:
             self,
             interaction: models.Interaction,
             data_option: models.InteractionDataOption
-    ) -> models.InterationResponse:
+    ) -> models.InteractionResponse:
         options: dict[str, Any] = self._params.copy()
 
         if data_option.options is not None:
@@ -99,7 +109,7 @@ class InteractionHandler:
     async def _call(
             self,
             interaction: models.Interaction
-    ) -> models.InterationResponse:
+    ) -> models.InteractionResponse:
         assert interaction.data is not None
 
         options: dict[str, Any] = self._params.copy()
@@ -115,16 +125,16 @@ class InteractionHandler:
         return await self.application_command(self.parent_self, interaction, **options)
 
     def _generate_application_command_options(self) -> tuple[models.ApplicationCommandOption, ...]:
-        description, param_descriptions = doc_parser(self.application_command.__doc__)
+        description, param_descriptions = _doc_parser(self.application_command.__doc__)
 
         func_annotations = inspect.get_annotations(self.application_command, eval_str=True)
 
         if "self" in func_annotations:
             func_annotations.pop("self")
-        if "ctx" in func_annotations:
-            func_annotations.pop("ctx")
-        if "context" in func_annotations:
-            func_annotations.pop("context")
+        if "interaction" in func_annotations:
+            func_annotations.pop("interaction")
+        if "return" in func_annotations:
+            func_annotations.pop("return")
 
         options = []
         for param, annotation in func_annotations.items():
@@ -190,16 +200,12 @@ class InteractionHandler:
 
     @property
     def description(self) -> tuple[str, dict[str, str]]:
-        return doc_parser(self.application_command.__doc__)
-
-
-def register_handler(inst: InteractionHandlerClass):
-    _InteractionHandlerMetaClass.register_handler(inst)
+        return _doc_parser(self.application_command.__doc__)
 
 
 _application_command_handler = Callable[
     [InteractionHandlerClass, models.Interaction, tuple[Any, ...], dict[str, Any]],
-    Coroutine[Any, Any, None | models.InterationResponse]
+    Coroutine[Any, Any, None | models.InteractionResponse]
 ]
 
 
@@ -215,7 +221,10 @@ _application_command_option_map = {
 }
 
 
-def doc_parser(doc_string: str) -> tuple[str, dict[str, str]]:
+def _doc_parser(doc_string: None | str) -> tuple[str, dict[str, str]]:
+    if doc_string is None:
+        return "", {}
+
     res = doc_string.split("\n\n")
     res = [i.strip() for i in res]
 

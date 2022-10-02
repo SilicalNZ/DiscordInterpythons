@@ -66,42 +66,6 @@ class ActionRow(_BaseModel):
     components: ActionRowComponents
 
 
-def cast_components(array: tuple[dict, ...]) -> Components:
-    results: list[Component] = []
-
-    for i in array:
-        if i["type"] == ComponentType.ACTION_ROW:
-            results.append(ActionRow(**i))
-        elif i["type"] == ComponentType.BUTTON:
-            results.append(Button(**i))
-        elif i["type"] == ComponentType.SELECT_MENU:
-            results.append(SelectMenu(**i))
-        elif i["type"] == ComponentType.TEXT_INPUT:
-            results.append(TextInput(**i))
-        else:
-            # TODO: Make this anonymous
-            raise AssertionError("Could not Convert type")
-
-    return tuple(results)
-
-
-def cast_action_row_components(array: tuple[dict, ...]) -> ActionRowComponents:
-    results: list[ActionRowComponent] = []
-
-    for i in array:
-        if i["type"] == ComponentType.BUTTON:
-            results.append(Button(**i))
-        elif i["type"] == ComponentType.SELECT_MENU:
-            results.append(SelectMenu(**i))
-        elif i["type"] == ComponentType.TEXT_INPUT:
-            results.append(TextInput(**i))
-        else:
-            # TODO: Make this anonymous
-            raise AssertionError("Could not Convert type")
-
-    return tuple(results)
-
-
 ActionRowComponent = Button | SelectMenu | TextInput
 ActionRowComponents = tuple[ActionRowComponent, ...]
 Component = Button | SelectMenu | TextInput | ActionRow

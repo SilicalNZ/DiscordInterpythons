@@ -14,7 +14,7 @@ _BASE_URL = "https://discord.com/api/v9"
 
 
 @dataclass
-class Channel(abc.ChannelABC):
+class ChannelAPI(abc.ChannelABC):
     channel_id: models.ChannelID
 
     async def _request(self, *, method: Method, endpoint: str = "", payload: None | dict = None) -> dict:
