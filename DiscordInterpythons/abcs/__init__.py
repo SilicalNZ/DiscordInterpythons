@@ -6,4 +6,7 @@ from .webhook import (
     WebhookAuthABC,
     WebhookABC,
     InteractionResponseABC,
+    ExecuteWebhookReq,
+    CreateFollowupReq,
+    UpdateWebhookMessageReq,
 )

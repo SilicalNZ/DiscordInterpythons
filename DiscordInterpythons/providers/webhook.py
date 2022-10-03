@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
 
 import aiohttp
 
 from DiscordInterpythons import models
 from DiscordInterpythons.abcs import webhook as abc
-from DiscordInterpythons.abcs.webhook import UpdateWebhookMessageReq, ExecuteWebhookReq, CreateFollowupReq
 from DiscordInterpythons.providers._shared import Method
 
 
@@ -258,7 +256,7 @@ class InteractionResponseAPI(abc.InteractionResponseABC):
     async def update(
             self,
             application_id: models.ApplicationID,
-            message: UpdateWebhookMessageReq,
+            message: abc.UpdateWebhookMessageReq,
             thread_id: None | models.ThreadID = None,
     ) -> models.Message:
         params = {}
@@ -284,7 +282,7 @@ class InteractionResponseAPI(abc.InteractionResponseABC):
     async def create_followup(
             self,
             application_id: models.ApplicationID,
-            message: CreateFollowupReq,
+            message: abc.CreateFollowupReq,
     ) -> models.Message:
         result = await self._request(
             method=Method.POST,
@@ -310,7 +308,7 @@ class InteractionResponseAPI(abc.InteractionResponseABC):
             self,
             application_id: models.ApplicationID,
             message_id: models.MessageID,
-            message: UpdateWebhookMessageReq,
+            message: abc.UpdateWebhookMessageReq,
             thread_id: None | models.ThreadID = None,
     ) -> models.Message:
         params = {}
