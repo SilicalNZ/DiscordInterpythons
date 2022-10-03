@@ -188,6 +188,7 @@ class WebhookABC(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
 
+@dataclass
 class InteractionResponseABC(metaclass=abc.ABCMeta):
     token: models.InteractionToken
 
