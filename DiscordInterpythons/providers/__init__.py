@@ -8,4 +8,5 @@ from .thread import ThreadAPI
 from .webhook import (
     WebhookAuthAPI,
     WebhookAPI,
+    InteractionResponseAPI,
 )

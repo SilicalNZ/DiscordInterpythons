@@ -5,4 +5,5 @@ from .thread import ThreadABC
 from .webhook import (
     WebhookAuthABC,
     WebhookABC,
+    InteractionResponseABC,
 )

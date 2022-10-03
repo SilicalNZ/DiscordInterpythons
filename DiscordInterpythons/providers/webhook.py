@@ -7,10 +7,11 @@ import aiohttp
 
 from DiscordInterpythons import models
 from DiscordInterpythons.abcs import webhook as abc
+from DiscordInterpythons.abcs.webhook import UpdateWebhookMessageReq, ExecuteWebhookReq, CreateFollowupReq
 from DiscordInterpythons.providers._shared import Method
 
 
-_BASE_URL = "https://discord.com/api/v8/webhooks"
+_BASE_URL = "https://discord.com/api/v8"
 
 
 @dataclass
@@ -118,7 +119,7 @@ class WebhookAPI(abc.WebhookABC):
         async with aiohttp.ClientSession(raise_for_status=True) as session:
             async with session.request(
                     method.value,
-                    endpoint,
+                    f"{_BASE_URL}{endpoint}",
                     json=payload,
                     params=params,
             ) as resp:
@@ -127,7 +128,7 @@ class WebhookAPI(abc.WebhookABC):
     async def read_webhook(self) -> models.Webhook:
         result = await self._request(
             method=Method.GET,
-            endpoint=f"/webhooks/{self.webhook_id}/{self.token}",
+            endpoint=f"/{self.webhook_id}/{self.token}",
         )
         return models.Webhook(**result)
 
@@ -219,4 +220,115 @@ class WebhookAPI(abc.WebhookABC):
         await self._request(
             method=Method.DELETE,
             endpoint=f"/webhooks/{self.webhook_id}/{self.token}/messages/{message_id}",
+        )
+
+
+class InteractionResponseAPI(abc.InteractionResponseABC):
+    async def _request(
+            self,
+            *,
+            method: Method,
+            endpoint: str = "",
+            payload: None | dict = None,
+            params: None | dict = None,
+    ) -> dict:
+        async with aiohttp.ClientSession(raise_for_status=True) as session:
+            async with session.request(
+                    method.value,
+                    f"{_BASE_URL}{endpoint}",
+                    json=payload,
+                    params=params,
+            ) as resp:
+                return await resp.json()
+
+    async def create(self, interaction_id: models.InteractionID):
+        return await self._request(
+            method=Method.POST,
+            endpoint=f"/interactions/{interaction_id}/{self.token}/callback",
+        )
+
+    async def read(self, application_id: models.ApplicationID) -> models.Message:
+        result = await self._request(
+            method=Method.GET,
+            endpoint=f"/webhooks/{application_id}/{self.token}/messages/@original",
+        )
+
+        return models.Message(**result)
+
+    async def update(
+            self,
+            application_id: models.ApplicationID,
+            message: UpdateWebhookMessageReq,
+            thread_id: None | models.ThreadID = None,
+    ) -> models.Message:
+        params = {}
+
+        if thread_id is not None:
+            params["thread_id"] = thread_id
+
+        result = await self._request(
+            method=Method.PATCH,
+            endpoint=f"/webhooks/{application_id}/{self.token}/messages/@original",
+            payload=message.dict(),
+            params=params,
+        )
+
+        return models.Message(**result)
+
+    async def delete(self, application_id: models.ApplicationID):
+        await self._request(
+            method=Method.DELETE,
+            endpoint=f"/interactions/{application_id}/{self.token}/@original",
+        )
+
+    async def create_followup(
+            self,
+            application_id: models.ApplicationID,
+            message: CreateFollowupReq,
+    ) -> models.Message:
+        result = await self._request(
+            method=Method.POST,
+            endpoint=f"/webhooks/{application_id}/{self.token}",
+            payload=message.dict(),
+        )
+
+        return models.Message(**result)
+
+    async def read_followup(
+            self,
+            application_id: models.ApplicationID,
+            message_id: models.MessageID,
+    ) -> models.Message:
+        result = await self._request(
+            method=Method.GET,
+            endpoint=f"/webhooks/{application_id}/{self.token}/messages/{message_id}",
+        )
+
+        return models.Message(**result)
+
+    async def update_followup(
+            self,
+            application_id: models.ApplicationID,
+            message_id: models.MessageID,
+            message: UpdateWebhookMessageReq,
+            thread_id: None | models.ThreadID = None,
+    ) -> models.Message:
+        params = {}
+
+        if thread_id is not None:
+            params["thread_id"] = thread_id
+
+        result = await self._request(
+            method=Method.PATCH,
+            endpoint=f"/webhooks/{application_id}/{self.token}/messages/{message_id}",
+            payload=message.dict(),
+            params=params,
+        )
+
+        return models.Message(**result)
+
+    async def delete_followup(self, application_id: models.ApplicationID, message_id: models.MessageID):
+        await self._request(
+            method=Method.DELETE,
+            endpoint=f"/webhooks/{application_id}/{self.token}/messages/{message_id}",
         )
