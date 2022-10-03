@@ -50,6 +50,7 @@ class InteractionResponse(_BaseModel):
         "data"
     }
 
+
 class Interaction(_BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 
