@@ -1,4 +1,4 @@
-from .application_command import DiscordApplicationCommandABC
+from .application_command import ApplicationCommandABC
 from .channel import ChannelABC
 from .message import MessageABC
 from .thread import ThreadABC

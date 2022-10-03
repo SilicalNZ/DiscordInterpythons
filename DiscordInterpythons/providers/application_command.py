@@ -5,8 +5,8 @@ import asyncio
 import json
 
 from DiscordInterpythons.handlers import InteractionHandlerClass
-from DiscordInterpythons.abcs import models as discord_model
-from DiscordInterpythons.abcs import application_command as abcs
+from DiscordInterpythons import models
+from DiscordInterpythons.abcs import application_command as abc
 
 
 class DiscordToken(str):
@@ -14,18 +14,18 @@ class DiscordToken(str):
 
 
 @dataclass
-class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
+class ApplicationCommandAPI(abc.ApplicationCommandABC):
     token: DiscordToken
-    application_id: discord_model.ApplicationID
-    debug_guild_id: None | discord_model.GuildID
-    local_application_commands: abcs.ApplicationCommand.S
+    application_id: models.ApplicationID
+    debug_guild_id: None | models.GuildID
+    local_application_commands: abc.ApplicationCommand.S
 
     @classmethod
     def from_interaction_handler_class(
             cls,
             token: DiscordToken,
-            application_id: None | discord_model.ApplicationID,
-            debug_guild_id: None | discord_model.GuildID,
+            application_id: None | models.ApplicationID,
+            debug_guild_id: None | models.GuildID,
     ):
         return cls(
             token=token,
@@ -53,7 +53,7 @@ class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
     def _header_content_type(self) -> dict[str, str]:
         return {"Content-Type": "application/json"}
 
-    async def read_applications(self) -> abcs.ApplicationCommand.S:
+    async def read_applications(self) -> abc.ApplicationCommand.S:
         url = self._base_endpoint
 
         async with aiohttp.ClientSession(
@@ -64,16 +64,16 @@ class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
                 }) as session:
             async with session.get(url) as resp:
                 result = await resp.json()
-                return tuple(abcs.ApplicationCommand(**i) for i in result)
+                return tuple(abc.ApplicationCommand(**i) for i in result)
 
-    async def delete_application(self, application: abcs.ApplicationCommand):
+    async def delete_application(self, application: abc.ApplicationCommand):
         url = f"{self._base_endpoint}/{application.id}"
 
         async with aiohttp.ClientSession(raise_for_status=True, headers={**self._header_auth}) as session:
             async with session.delete(url):
                 pass
 
-    async def create_or_update_application(self, application: abcs.ApplicationCommand):
+    async def create_or_update_application(self, application: abc.ApplicationCommand):
         url = self._base_endpoint
 
         async with aiohttp.ClientSession(headers={**self._header_auth, **self._header_content_type}) as session:
@@ -83,7 +83,7 @@ class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
     async def initialize(self):
         check_deletion_foreign_application_commands = await self.read_applications()
 
-        foreign_application_commands: tuple[abcs.ApplicationCommand, ...] = ()
+        foreign_application_commands: tuple[abc.ApplicationCommand, ...] = ()
         for foreign_application_command in check_deletion_foreign_application_commands:
             if self._foreign_application_command_should_be_deleted(foreign_application_command):
                 await self.delete_application(foreign_application_command)
@@ -98,7 +98,7 @@ class ApplicationCommandAPI(abcs.DiscordApplicationCommandABC):
             else:
                 await self.create_or_update_application(local_application_command)
 
-    def _foreign_application_command_should_be_deleted(self, application_command: abcs.ApplicationCommand) -> bool:
+    def _foreign_application_command_should_be_deleted(self, application_command: abc.ApplicationCommand) -> bool:
         for local_application_command in self.local_application_commands:
             if local_application_command.name == application_command.name:
                 return True
