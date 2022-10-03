@@ -77,7 +77,7 @@ class ApplicationCommandAPI(abc.ApplicationCommandABC):
         url = self._base_endpoint
 
         async with aiohttp.ClientSession(headers={**self._header_auth, **self._header_content_type}) as session:
-            async with session.post(url, data=application.json()):
+            async with session.post(url, data=json.dumps(application.dict())):
                 pass
 
     async def initialize(self):
