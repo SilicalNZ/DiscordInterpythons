@@ -19,6 +19,8 @@ class InteractionToken(str):
 
 
 class InteractionCallbackData(_BaseModel):
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure
+
     tts: None | bool = None
     content: None | str = None
     embeds: None | Embed.S = None
@@ -27,11 +29,26 @@ class InteractionCallbackData(_BaseModel):
     components: None | Components = None
     attachments: None | Attachment.S = None
 
+    _omit = {
+        "tts",
+        "content",
+        "embeds",
+        "allowed_mentions",
+        "flags",
+        "components",
+        "attachments",
+    }
+
 
 class InteractionResponse(_BaseModel):
-    type: InteractionResponseType = None
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure
+
+    type: InteractionResponseType
     data: None | InteractionCallbackData = None
 
+    _omit = {
+        "data"
+    }
 
 class Interaction(_BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
