@@ -14,13 +14,13 @@ def verify_key(raw_body: bytes, signature: str, timestamp: str, client_public_ke
         return False
 
 
-async def handle_interaction(data: dict) -> dict:
+async def handle_interaction(data: dict) -> str:
     interaction = models.Interaction(**data)
 
     if interaction.type == models.InteractionType.PING:
         return models.InteractionResponse(
             type=models.InteractionResponseType.PONG,
-        ).dict()
+        ).json()
 
     response = await handler.InteractionHandlerClass.call(interaction)
-    return response.dict()
+    return response.json()
