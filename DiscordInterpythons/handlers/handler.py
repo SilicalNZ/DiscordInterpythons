@@ -181,7 +181,7 @@ class InteractionHandler:
                 if len(value._sub_commands) == 0 else models.ApplicationCommandOptionType.SUB_COMMAND_GROUP,
                 name=key,
                 description=value.description[0],
-                option=value._generate_application_command_options(),
+                options=value._generate_application_command_options(),
             ))
 
         return tuple(options)
