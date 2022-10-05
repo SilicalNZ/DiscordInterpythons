@@ -47,6 +47,8 @@ class _InteractionHandlerMetaClass(type):
         application_commands: list[models.ApplicationCommand] = []
 
         for key, value in mcs._command_storage.items():
+            if value.sub_command_parent is not None:
+                continue
             application_commands.append(value._generate_application_command())
 
         return tuple(application_commands)
@@ -175,7 +177,8 @@ class InteractionHandler:
 
         for key, value in self._sub_commands.items():
             options.append(models.ApplicationCommandOption(
-                type=models.ApplicationCommandOptionType.SUB_COMMAND,
+                type=models.ApplicationCommandOptionType.SUB_COMMAND
+                if len(value._sub_commands) == 0 else models.ApplicationCommandOptionType.SUB_COMMAND_GROUP,
                 name=key,
                 description=value.description[0],
                 option=value._generate_application_command_options(),
@@ -195,6 +198,8 @@ class InteractionHandler:
             self,
             name: None | str = None,
     ) -> InteractionHandler:
+        assert self.sub_command_parent is None or self.sub_command_parent.sub_command_parent is None
+
         handler = InteractionHandler(name=name, sub_command_parent=self)
         return handler
 

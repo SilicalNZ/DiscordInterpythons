@@ -58,10 +58,10 @@ class ApplicationCommand(_BaseModel):
 
     S = tuple["ApplicationCommand", ...]
 
-    type: None | ApplicationCommandType
     name: str
     description: str
-    version: None | Version
+    type: None | ApplicationCommandType = None
+    version: None | Version = None
     options: None | ApplicationCommandOption.S = None
     id: None | ApplicationCommandID = None
     application_id: None | ApplicationID = None
@@ -73,10 +73,34 @@ class ApplicationCommand(_BaseModel):
 
     _omit = {
         "type",
+        "version",
+        "options",
+        "id",
+        "application_id",
         "guild_id",
         "name_localizations",
         "description_localizations",
-        "options",
+        "default_member_permissions",
         "dm_permission",
-        "default_permission",
     }
+
+    def is_different(self, other: ApplicationCommand) -> bool:
+        assert other.name == self.name
+
+        if other.description != self.description:
+            return True
+        elif ((other.options is None and self.options is not None)
+                or (other.options is not None and self.options is None)
+                or ((other.options is not None and len(other.options) == 0)
+                    and (self.options is not None and len(self.options) == 0))):
+            return False
+        elif len(other.options) != len(other.options):
+            return True
+
+        def sort_lamb(option: ApplicationCommandOption):
+            return option.name
+
+        for x, y in zip(sorted(other.options, key=sort_lamb), sorted(other.options, key=sort_lamb)):
+            if x != y:
+                return True
+        return False

@@ -23,6 +23,10 @@ class ApplicationCommandABC(metaclass=abc.ABCMeta):
     async def create_or_update_application(self, application: ApplicationCommand):
         raise NotImplementedError()
 
+    # https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
     @abc.abstractmethod
+    async def create_or_update_all_applications(self, application_commands: ApplicationCommand.S):
+        raise NotImplementedError
+
     async def initialize(self):
         raise NotImplementedError()

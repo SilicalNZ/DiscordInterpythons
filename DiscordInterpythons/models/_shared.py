@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import json
 
 from pydantic import BaseModel as PyDanticBaseModel
 
@@ -13,7 +14,7 @@ class _BaseModel(PyDanticBaseModel):
         return {
             name
             for name in self._omit
-            if getattr(self, name, None) is None
+            if not getattr(self, name, None)
         }
 
     def dict(
@@ -27,3 +28,12 @@ class _BaseModel(PyDanticBaseModel):
         **kwargs,
     ) -> str:
         return super().json(exclude=self._omitted_fields)
+
+    def dict_as_valid_json(
+        self,
+        **kwargs,
+    ) -> dict[str, Any]:
+        # This is so jank, but it seems Enums do not convert to json unless passed through their json encoder
+        # Their json encoder also seems to be a lambda x: x, so I really don't know what is going on
+        # Python is just dumb
+        return json.loads(self.json(**kwargs))
