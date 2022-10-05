@@ -91,38 +91,24 @@ class InteractionHandler:
     def name(self) -> str:
         return self._name or self.application_command.__name__
 
-    async def _sub_command_call(
-            self,
-            interaction: models.Interaction,
-            data_option: models.InteractionDataOption
-    ) -> models.InteractionResponse:
-        options: dict[str, Any] = self._params.copy()
-
-        if data_option.options is not None:
-            for option in interaction.data.options:
-                if option.type == models.ApplicationCommandOptionType.SUB_COMMAND:
-                    return await self._sub_commands[option.name]._sub_command_call(interaction, option)
-
-                assert option.name in options
-                options[option.name] = option.value
-
-        return await self.application_command(self.parent_self, interaction, **options)
-
     async def _call(
             self,
-            interaction: models.Interaction
+            interaction: models.Interaction,
+            data_option: None | models.InteractionDataOption = None,
     ) -> models.InteractionResponse:
         assert interaction.data is not None
 
-        options: dict[str, Any] = self._params.copy()
+        options: dict[str, Any] = {}
+        iterative_options = data_option.options if data_option is not None else interaction.data.options
 
-        if interaction.data.options is not None:
-            for option in interaction.data.options:
-                if option.type == models.ApplicationCommandOptionType.SUB_COMMAND:
-                    return await self._sub_commands[option.name]._sub_command_call(interaction, option)
+        for option in iterative_options or ():
+            if (
+                    option.type == models.ApplicationCommandOptionType.SUB_COMMAND_GROUP
+                    or option.type == models.ApplicationCommandOptionType.SUB_COMMAND
+            ):
+                return await self._sub_commands[option.name]._call(interaction, option)
 
-                assert option.name in options
-                options[option.name] = option.value
+            options[option.name] = option.value
 
         return await self.application_command(self.parent_self, interaction, **options)
 
@@ -212,7 +198,6 @@ _application_command_handler = Callable[
     [InteractionHandlerClass, models.Interaction, tuple[Any, ...], dict[str, Any]],
     Coroutine[Any, Any, None | models.InteractionResponse]
 ]
-
 
 _application_command_option_map = {
     str: models.ApplicationCommandOptionType.STRING,
