@@ -23,7 +23,7 @@ class _InteractionHandlerMetaClass(type):
 
         mcs._cls_storage[cls] = []
         for name, method in attrs.items():
-            if isinstance(method, ChatInputHandler):
+            if isinstance(method, ChatInputHandler) and not isinstance(method, SubCommandHandler):
                 mcs._command_storage[method.name] = method
                 mcs._cls_storage[cls].append(method)
 
@@ -32,7 +32,7 @@ class _InteractionHandlerMetaClass(type):
     @classmethod
     def register_handler(mcs, inst: InteractionHandlerClass):
         for chat_input in mcs._cls_storage[type(inst)]:
-            chat_input.parent_self = inst
+            chat_input._parent_self = inst
 
     @classmethod
     async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
