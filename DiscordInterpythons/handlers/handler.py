@@ -181,7 +181,7 @@ class ChatInputHandler:
 
     def _generate_application_command(self) -> models.ApplicationCommand:
         return models.ApplicationCommand(
-            type=models.InteractionType.APPLICATION_COMMAND,
+            type=models.ApplicationCommandType.CHAT_INPUT,
             name=self.name,
             description=self.description[0],
             options=self._generate_application_command_options(),
