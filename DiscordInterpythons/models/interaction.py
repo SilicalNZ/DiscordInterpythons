@@ -12,6 +12,7 @@ from DiscordInterpythons.models.flag import MessageFlags
 from DiscordInterpythons.models.component import Components
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.models.application_command import ApplicationCommandOptionChoice
 
 
 class InteractionToken(str):
@@ -29,6 +30,14 @@ class InteractionCallbackData(_BaseModel):
     components: None | Components = None
     attachments: None | Attachment.S = None
 
+    # TODO: These should be their own classes
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
+    choices: None | tuple[ApplicationCommandOptionChoice, ...] = None
+
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal
+    custom_id: None | str = None
+    title: None | str = None
+
     _omit = {
         "tts",
         "content",
@@ -37,6 +46,9 @@ class InteractionCallbackData(_BaseModel):
         "flags",
         "components",
         "attachments",
+        "choices",
+        "custom_id",
+        "title",
     }
 
 
