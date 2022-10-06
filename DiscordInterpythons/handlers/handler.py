@@ -60,6 +60,7 @@ class InteractionHandlerClass(metaclass=_InteractionHandlerMetaClass):
 class ChatInputHandler:
     _private_parent_self: None | InteractionHandlerClass = None
     _sub_commands: dict[str, ChatInputHandler]
+    _auto_completes: dict[str, AutoCompleteHandler]
 
     @property
     def _parent_self(self) -> None | InteractionHandlerClass:
@@ -68,8 +69,11 @@ class ChatInputHandler:
     @_parent_self.setter
     def _parent_self(self, inst: InteractionHandlerClass):
         self._private_parent_self = inst
-        for sub_command in self._sub_commands:
+        for sub_command in self._sub_commands.values():
             sub_command._parent_self = inst
+
+        for auto_complete in self._auto_completes.values():
+            auto_complete._parent_self = inst
 
     def __init__(
             self,
@@ -235,9 +239,9 @@ class AutoCompleteHandler:
     def __init__(
             self,
     ):
-        self.handler: None | _application_command_handler = None
+        self.handler: None | _auto_complete_handler = None
 
-    def __call__(self, handler: _application_command_handler):
+    def __call__(self, handler: _auto_complete_handler):
         self.handler = validate_arguments(handler)
 
         return self
@@ -248,6 +252,12 @@ class AutoCompleteHandler:
             value: str,
     ) -> models.InteractionResponse:
         return await self.handler(self._parent_self, interaction, value)
+
+
+_auto_complete_handler = Callable[
+    [InteractionHandlerClass, models.Interaction, str],
+    Coroutine[Any, Any, None | models.InteractionResponse]
+]
 
 
 _application_command_handler = Callable[
