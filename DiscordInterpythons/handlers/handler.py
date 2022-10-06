@@ -12,8 +12,8 @@ from DiscordInterpythons import models
 
 
 class _InteractionHandlerMetaClass(type):
-    _cls_storage: dict[InteractionHandlerClass, list[InteractionHandler, ...]] = {}
-    _command_storage: dict[str, InteractionHandler] = {}
+    _cls_storage: dict[typing.Type[InteractionHandlerClass], list[ChatInputHandler, ...]] = {}
+    _command_storage: dict[str, ChatInputHandler] = {}
 
     def __new__(mcs, name, bases, attrs, **kwargs):
         cls = super().__new__(mcs, name, bases, attrs)
@@ -23,7 +23,7 @@ class _InteractionHandlerMetaClass(type):
 
         mcs._cls_storage[cls] = []
         for name, method in attrs.items():
-            if isinstance(method, InteractionHandler):
+            if isinstance(method, ChatInputHandler):
                 mcs._command_storage[method.name] = method
                 mcs._cls_storage[cls].append(method)
 
@@ -31,8 +31,8 @@ class _InteractionHandlerMetaClass(type):
 
     @classmethod
     def register_handler(mcs, inst: InteractionHandlerClass):
-        for i in mcs._cls_storage[type(inst)]:
-            i.parent_self = inst
+        for chat_input in mcs._cls_storage[type(inst)]:
+            chat_input.parent_self = inst
 
     @classmethod
     async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
@@ -47,8 +47,6 @@ class _InteractionHandlerMetaClass(type):
         application_commands: list[models.ApplicationCommand] = []
 
         for key, value in mcs._command_storage.items():
-            if value.sub_command_parent is not None:
-                continue
             application_commands.append(value._generate_application_command())
 
         return tuple(application_commands)
@@ -59,31 +57,32 @@ class InteractionHandlerClass(metaclass=_InteractionHandlerMetaClass):
         _InteractionHandlerMetaClass.register_handler(self)
 
 
-class InteractionHandler:
-    TYPE = models.ApplicationCommandType
-    parent_self: None | InteractionHandlerClass = None
-    _params: dict[str, None]
-    _sub_commands: dict[str, InteractionHandler]
-    sub_command_parent: None | InteractionHandler = None
+class ChatInputHandler:
+    _private_parent_self: None | InteractionHandlerClass = None
+    _sub_commands: dict[str, ChatInputHandler]
+
+    @property
+    def _parent_self(self) -> None | InteractionHandlerClass:
+        return self._private_parent_self
+
+    @_parent_self.setter
+    def _parent_self(self, inst: InteractionHandlerClass):
+        self._private_parent_self = inst
+        for sub_command in self._sub_commands:
+            sub_command._parent_self = inst
 
     def __init__(
             self,
-            type: models.ApplicationCommandType = models.ApplicationCommandType.CHAT_INPUT,
             name: None | str = None,
-            sub_command_parent: None | InteractionHandler = None,
+            auto_completes: None | dict[str, AutoCompleteHandler] = None,
     ):
         self.application_command: None | _application_command_handler = None
-        self.type = type
         self._name = name
-        self._params = {}
         self._sub_commands = {}
-        self.sub_command_parent = sub_command_parent
+        self._auto_completes = auto_completes or {}
 
     def __call__(self, application_command: _application_command_handler):
         self.application_command = validate_arguments(application_command)
-
-        if self.sub_command_parent:
-            self.sub_command_parent._sub_commands[self.name] = self
 
         return self
 
@@ -102,7 +101,9 @@ class InteractionHandler:
         iterative_options = data_option.options if data_option is not None else interaction.data.options
 
         for option in iterative_options or ():
-            if (
+            if option.focused:
+                return await self._auto_completes[option.name]._call(interaction, option.value)
+            elif (
                     option.type == models.ApplicationCommandOptionType.SUB_COMMAND_GROUP
                     or option.type == models.ApplicationCommandOptionType.SUB_COMMAND
             ):
@@ -110,7 +111,7 @@ class InteractionHandler:
 
             options[option.name] = option.value
 
-        return await self.application_command(self.parent_self, interaction, **options)
+        return await self.application_command(self._parent_self, interaction, **options)
 
     def _generate_application_command_options(self) -> tuple[models.ApplicationCommandOption, ...]:
         description, param_descriptions = _doc_parser(self.application_command.__doc__)
@@ -157,9 +158,11 @@ class InteractionHandler:
                 name=param,
                 description=param_description,
                 required=required,
+                autocomplete=(
+                    param in self._auto_completes
+                    and option_type == models.ApplicationCommandOptionType.STRING
+                ) or None
             ))
-
-            self._params[param] = None
 
         for key, value in self._sub_commands.items():
             options.append(models.ApplicationCommandOption(
@@ -174,7 +177,7 @@ class InteractionHandler:
 
     def _generate_application_command(self) -> models.ApplicationCommand:
         return models.ApplicationCommand(
-            type=self.type,
+            type=models.InteractionType.APPLICATION_COMMAND,
             name=self.name,
             description=self.description[0],
             options=self._generate_application_command_options(),
@@ -183,15 +186,68 @@ class InteractionHandler:
     def sub_command(
             self,
             name: None | str = None,
-    ) -> InteractionHandler:
-        assert self.sub_command_parent is None or self.sub_command_parent.sub_command_parent is None
-
-        handler = InteractionHandler(name=name, sub_command_parent=self)
-        return handler
+            auto_completes: None | dict[str, AutoCompleteHandler] = None,
+    ) -> ChatInputHandler:
+        return SubCommandHandler(
+            name=name,
+            sub_command_parent=self,
+            auto_completes=auto_completes,
+        )
 
     @property
     def description(self) -> tuple[str, dict[str, str]]:
         return _doc_parser(self.application_command.__doc__)
+
+
+class SubCommandHandler(ChatInputHandler):
+    sub_command_parent: None | ChatInputHandler = None
+
+    def __init__(
+            self,
+            name: None | str = None,
+            sub_command_parent: ChatInputHandler = None,
+            auto_completes: None | dict[str, AutoCompleteHandler] = None
+    ):
+        self.sub_command_parent = sub_command_parent
+        super().__init__(name=name, auto_completes=auto_completes)
+
+    def __call__(self, application_command: _application_command_handler):
+        if self.sub_command_parent:
+            self.sub_command_parent._sub_commands[self.name] = self
+
+        return super().__call__(application_command)
+
+    def sub_command(
+            self,
+            name: None | str = None,
+            auto_completes: None | dict[str, AutoCompleteHandler] = None,
+    ) -> SubCommandHandler:
+        return SubCommandHandler(
+            name=name,
+            sub_command_parent=self,
+            auto_completes=auto_completes,
+        )
+
+
+class AutoCompleteHandler:
+    _parent_self: None | InteractionHandlerClass = None
+
+    def __init__(
+            self,
+    ):
+        self.handler: None | _application_command_handler = None
+
+    def __call__(self, handler: _application_command_handler):
+        self.handler = validate_arguments(handler)
+
+        return self
+
+    async def _call(
+            self,
+            interaction: models.Interaction,
+            value: str,
+    ) -> models.InteractionResponse:
+        return await self.handler(self._parent_self, interaction, value)
 
 
 _application_command_handler = Callable[

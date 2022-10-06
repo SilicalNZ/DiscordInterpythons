@@ -1,6 +1,8 @@
 from .handler import (
-    InteractionHandler,
     InteractionHandlerClass,
+    ChatInputHandler,
+    SubCommandHandler,
+    AutoCompleteHandler,
 )
 from .middleware import (
     handle_interaction,
