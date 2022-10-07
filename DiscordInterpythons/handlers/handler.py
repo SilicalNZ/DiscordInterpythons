@@ -106,7 +106,7 @@ class ChatInputHandler:
 
         for option in iterative_options or ():
             if option.focused:
-                return await self._auto_completes[option.name]._call(interaction, option.value)
+                return await self._auto_completes[option.name]._call(interaction, iterative_options, option.value)
             elif (
                     option.type == models.ApplicationCommandOptionType.SUB_COMMAND_GROUP
                     or option.type == models.ApplicationCommandOptionType.SUB_COMMAND
@@ -249,13 +249,14 @@ class AutoCompleteHandler:
     async def _call(
             self,
             interaction: models.Interaction,
+            options: models.InteractionDataOption.S,
             value: str,
     ) -> models.InteractionResponse:
-        return await self.handler(self._parent_self, interaction, value)
+        return await self.handler(self._parent_self, interaction, {i.name: i for i in options}, value)
 
 
 _auto_complete_handler = Callable[
-    [InteractionHandlerClass, models.Interaction, str],
+    [InteractionHandlerClass, models.Interaction, dict[str, models.InteractionDataOption], str],
     Coroutine[Any, Any, None | models.InteractionResponse]
 ]
 
