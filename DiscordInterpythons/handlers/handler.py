@@ -42,7 +42,10 @@ class _InteractionHandlerMetaClass(type):
 
     @classmethod
     async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
-        if interaction.type == models.InteractionType.APPLICATION_COMMAND:
+        if interaction.type in (
+                models.InteractionType.APPLICATION_COMMAND,
+                models.InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE,
+        ):
             handler = mcs._chat_input_handler_storage.get(interaction.data.name)
 
             assert handler
