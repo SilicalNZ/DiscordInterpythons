@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from DiscordInterpythons.models.model_type import ApplicationCommandType, ApplicationCommandOptionType
+from DiscordInterpythons.models.model_type import ApplicationCommandType, ApplicationCommandOptionType, ComponentType
 from DiscordInterpythons.models.snowflake import ApplicationCommandID, UserOrMessageID, GuildID
 from DiscordInterpythons.models.user import User
 from DiscordInterpythons.models.guild_member import GuildMember
@@ -9,6 +9,7 @@ from DiscordInterpythons.models.channel import Channel
 from DiscordInterpythons.models.message import Message
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.models.component import SelectOption, Components
 
 
 class InteractionDataOption(_BaseModel):
@@ -77,3 +78,21 @@ class InteractionData(_BaseModel):
         "guild_id",
         "target_id",
     }
+
+
+class InteractionDataMessageComponent(_BaseModel):
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure
+
+    custom_id: str
+    component_type: ComponentType
+    values: None | SelectOption.S
+
+
+class InteractionDataModalSubmit(_BaseModel):
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
+
+    custom_id: str
+    components: Components
+
+
+InteractionDataStructures = InteractionData | InteractionDataMessageComponent | InteractionDataModalSubmit

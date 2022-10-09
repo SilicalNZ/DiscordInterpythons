@@ -39,6 +39,12 @@ from .emoji import (
     PartialEmoji,
     Emoji,
 )
+from .emoji_type import (
+    discord_emoji_converter,
+    discord_emoji_converter_inverse,
+    EmojiUnicodeType,
+    EmojiNameType,
+)
 from .flag import (
     ChannelFlag,
     SystemChannelFlags,
@@ -70,6 +76,9 @@ from .interaction_data import (
     InteractionDataOption,
     InteractionResolvedData,
     InteractionData,
+    InteractionDataMessageComponent,
+    InteractionDataModalSubmit,
+    InteractionDataStructures,
 )
 from .invite import (
     InvitePartialGuild,

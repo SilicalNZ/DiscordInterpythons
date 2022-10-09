@@ -12,8 +12,9 @@ from DiscordInterpythons import models
 
 
 class _InteractionHandlerMetaClass(type):
-    _cls_storage: dict[typing.Type[InteractionHandlerClass], list[ChatInputHandler, ...]] = {}
-    _command_storage: dict[str, ChatInputHandler] = {}
+    _cls_storage: dict[typing.Type[InteractionHandlerClass], list[_Handler, ...]] = {}
+    _chat_input_handler_storage: dict[str, ChatInputHandler] = {}
+    _button_handler_store: dict[str, ButtonHandler] = {}
 
     def __new__(mcs, name, bases, attrs, **kwargs):
         cls = super().__new__(mcs, name, bases, attrs)
@@ -21,12 +22,17 @@ class _InteractionHandlerMetaClass(type):
         if name == "InteractionHandlerClass":
             return cls
 
+        assert issubclass(cls, InteractionHandlerClass)
+
         mcs._cls_storage[cls] = []
         for name, method in attrs.items():
             if isinstance(method, ChatInputHandler) and not isinstance(method, SubCommandHandler):
-                mcs._command_storage[method.name] = method
+                mcs._chat_input_handler_storage[method.name] = method
                 mcs._cls_storage[cls].append(method)
 
+            if isinstance(method, ButtonHandler):
+                mcs._button_handler_store[method.custom_id] = method
+                mcs._cls_storage[cls].append(method)
         return cls
 
     @classmethod
@@ -36,17 +42,29 @@ class _InteractionHandlerMetaClass(type):
 
     @classmethod
     async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
-        handler = mcs._command_storage.get(interaction.data.name)
+        if interaction.type == models.InteractionType.APPLICATION_COMMAND:
+            handler = mcs._chat_input_handler_storage.get(interaction.data.name)
 
-        assert handler
+            assert handler
 
-        return await handler._call(interaction)
+            return await handler._call(interaction)
+        elif interaction.type == models.InteractionType.MESSAGE_COMPONENT \
+                and interaction.data.component_type == models.ComponentType.BUTTON:
+            handler_id = interaction.data.custom_id.split(":")
+
+            handler = mcs._button_handler_store.get(handler_id[0])
+
+            assert handler
+
+            return await handler._call(interaction, "".join(handler[1:]))
+
+        assert True is False
 
     @classmethod
     def generate_application_commands(mcs) -> models.ApplicationCommand.S:
         application_commands: list[models.ApplicationCommand] = []
 
-        for key, value in mcs._command_storage.items():
+        for key, value in mcs._chat_input_handler_storage.items():
             application_commands.append(value._generate_application_command())
 
         return tuple(application_commands)
@@ -57,7 +75,11 @@ class InteractionHandlerClass(metaclass=_InteractionHandlerMetaClass):
         _InteractionHandlerMetaClass.register_handler(self)
 
 
-class ChatInputHandler:
+class _Handler:
+    _parent_self: None | InteractionHandlerClass = None
+
+
+class ChatInputHandler(_Handler):
     _private_parent_self: None | InteractionHandlerClass = None
     _sub_commands: dict[str, ChatInputHandler]
     _auto_completes: dict[str, AutoCompleteHandler]
@@ -233,13 +255,8 @@ class SubCommandHandler(ChatInputHandler):
         )
 
 
-class AutoCompleteHandler:
-    _parent_self: None | InteractionHandlerClass = None
-
-    def __init__(
-            self,
-    ):
-        self.handler: None | _auto_complete_handler = None
+class AutoCompleteHandler(_Handler):
+    handler: None | _auto_complete_handler = None
 
     def __call__(self, handler: _auto_complete_handler):
         self.handler = validate_arguments(handler)
@@ -255,8 +272,53 @@ class AutoCompleteHandler:
         return await self.handler(self._parent_self, interaction, {i.name: i for i in options}, value)
 
 
+class ButtonHandler(_Handler):
+    handler: None | _button_handler = None
+
+
+    def __init__(self, custom_id: str):
+        self.custom_id = custom_id
+
+    def __call__(self, handler: _button_handler):
+        self.handler = validate_arguments(handler)
+
+        return self
+
+    async def _call(
+            self,
+            interaction: models.Interaction,
+            custom_id: str,
+    ) -> models.InteractionResponse:
+        return await self.handler(self._parent_self, interaction, custom_id)
+
+    def build(
+            self,
+            custom_id: str,
+            label: str,
+            emoji: models.PartialEmoji = None,
+            style: models.ButtonStyleType = models.ButtonStyleType.Primary,
+            url: str = None,
+            disabled: bool = False,
+    ) -> models.Button:
+        return models.Button(
+            type=models.ComponentType.BUTTON,
+            style=style,
+            label=label,
+            emoji=emoji,
+            custom_id=f"{self.custom_id}:{custom_id}",
+            url=url,
+            disabled=disabled,
+        )
+
+
 _auto_complete_handler = Callable[
     [InteractionHandlerClass, models.Interaction, dict[str, models.InteractionDataOption], str],
+    Coroutine[Any, Any, None | models.InteractionResponse]
+]
+
+
+_button_handler = Callable[
+    [InteractionHandlerClass, models.Interaction, str],
     Coroutine[Any, Any, None | models.InteractionResponse]
 ]
 

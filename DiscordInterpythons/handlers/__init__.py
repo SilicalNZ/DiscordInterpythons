@@ -3,6 +3,7 @@ from .handler import (
     ChatInputHandler,
     SubCommandHandler,
     AutoCompleteHandler,
+    ButtonHandler,
 )
 from .middleware import (
     handle_interaction,

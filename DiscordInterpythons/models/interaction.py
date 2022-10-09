@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from DiscordInterpythons.models.snowflake import InteractionID, ApplicationID, ChannelID, GuildID
 from DiscordInterpythons.models.model_type import InteractionType, Locale, InteractionResponseType
-from DiscordInterpythons.models.interaction_data import InteractionData
+from DiscordInterpythons.models.interaction_data import InteractionData, InteractionDataStructures
 from DiscordInterpythons.models.guild_member import GuildMember
 from DiscordInterpythons.models.user import User
 from DiscordInterpythons.models.message import Message
@@ -69,7 +69,7 @@ class Interaction(_BaseModel):
     id: InteractionID
     application_id: ApplicationID
     type: InteractionType
-    data: None | InteractionData
+    data: None | InteractionDataStructures
     guild_id: None | GuildID
     channel_id: None | ChannelID
     member: None | GuildMember
@@ -81,7 +81,7 @@ class Interaction(_BaseModel):
     guild_locale: None | Locale
 
     def get_sub_command(self) -> None | InteractionData:
-        if self.data is None:
+        if self.data is None and not isinstance(self.data, InteractionData):
             return None
 
         return self.data.get_sub_command()
