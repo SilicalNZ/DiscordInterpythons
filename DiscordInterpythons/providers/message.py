@@ -17,6 +17,11 @@ _BASE_URL = "https://discord.com/api/v9"
 class MessageAPI(abc.MessageABC):
     channel_id: models.ChannelID
     message_id: models.MessageID
+    token: str
+
+    @property
+    def _header_auth(self) -> dict[str, str]:
+        return {"Authorization": f"Bot {self.token}"}
 
     async def _request(
             self,
@@ -25,15 +30,23 @@ class MessageAPI(abc.MessageABC):
             endpoint: str = "",
             payload: None | dict = None,
             params: None | dict = None,
+            respond: bool = True,
     ) -> dict:
-        async with aiohttp.ClientSession(raise_for_status=True) as session:
+        async with aiohttp.ClientSession(
+                headers={**self._header_auth},
+        ) as session:
             async with session.request(
                     method.value,
                     f"{_BASE_URL}/channels/{self.channel_id}/messages/{self.message_id}{endpoint}",
                     json=payload,
                     params=params,
             ) as resp:
-                return await resp.json()
+                if not (200 <= resp.status <= 299):
+                    raise AssertionError(
+                        f"Code: {resp.status}, URL: {_BASE_URL}/channels/{self.channel_id}/messages/{self.message_id}{endpoint}, Response: {await resp.text()}")
+                if respond:
+                    return await resp.json()
+                return {}
 
     async def read(self) -> models.Message:
         result = await self._request(method=Method.GET)
@@ -91,7 +104,7 @@ class MessageAPI(abc.MessageABC):
     async def update(self, message: abc.UpdateMessageReq) -> models.Message:
         result = await self._request(
             method=Method.PATCH,
-            payload=message.dict(),
+            payload=message.dict_as_valid_json(),
         )
         return models.Message(**result)
 

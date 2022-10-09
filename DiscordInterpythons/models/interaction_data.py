@@ -9,7 +9,7 @@ from DiscordInterpythons.models.channel import Channel
 from DiscordInterpythons.models.message import Message
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.models._shared import _BaseModel
-from DiscordInterpythons.models.component import SelectOption, Components
+from DiscordInterpythons.models.component import SelectOption, ActionRow
 
 
 class InteractionDataOption(_BaseModel):
@@ -92,7 +92,7 @@ class InteractionDataModalSubmit(_BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
 
     custom_id: str
-    components: Components
+    components: ActionRow.S
 
 
 InteractionDataStructures = InteractionData | InteractionDataMessageComponent | InteractionDataModalSubmit

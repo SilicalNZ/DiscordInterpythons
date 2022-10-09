@@ -9,7 +9,7 @@ from DiscordInterpythons.models.message import Message
 from DiscordInterpythons.models.embed import Embed
 from DiscordInterpythons.models.allowed_mention import AllowedMention
 from DiscordInterpythons.models.flag import MessageFlags
-from DiscordInterpythons.models.component import Components
+from DiscordInterpythons.models.component import ActionRow
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.models._shared import _BaseModel
 from DiscordInterpythons.models.application_command import ApplicationCommandOptionChoice
@@ -27,7 +27,7 @@ class InteractionCallbackData(_BaseModel):
     embeds: None | Embed.S = None
     allowed_mentions: None | AllowedMention.S = None
     flags: None | MessageFlags = None
-    components: None | Components = None
+    components: None | ActionRow.S = None
     attachments: None | Attachment.S = None
 
     # TODO: These should be their own classes

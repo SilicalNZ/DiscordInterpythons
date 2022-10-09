@@ -1,6 +1,5 @@
 from .application_command import (
     ApplicationCommandAPI,
-    DiscordToken,
 )
 from .channel import ChannelAPI
 from .message import MessageAPI

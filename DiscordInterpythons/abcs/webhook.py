@@ -14,7 +14,7 @@ class ExecuteWebhookReq(_BaseModel):
     tts: None | bool = None
     embeds: None | models.Embed.S = None
     allowed_mentions: None | models.AllowedMention = None
-    components: None | models.Components = None
+    components: None | models.ActionRow.S = None
     # files
     payload_json: str
     attachments: None | models.Attachment.S = None
@@ -40,7 +40,7 @@ class CreateFollowupReq(_BaseModel):
     tts: None | bool = None
     embeds: None | models.Embed.S = None
     allowed_mentions: None | models.AllowedMention = None
-    components: None | models.Components = None
+    components: None | models.ActionRow.S = None
     # files
     payload_json: str
     attachments: None | models.Attachment.S = None
@@ -63,7 +63,7 @@ class UpdateWebhookMessageReq(_BaseModel):
     content: None | str
     embeds: None | models.Embed.S = None
     allowed_mentions: None | models.AllowedMention = None
-    components: None | models.Components = None
+    components: None | models.ActionRow.S = None
     # files
     payload_json: str
     attachments: None | models.Attachment.S = None

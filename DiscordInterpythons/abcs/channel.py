@@ -40,7 +40,7 @@ class CreateChannelMessageReq(_BaseModel):
     embeds: None | models.Embed.S
     allowed_mentions: None | models.AllowedMention
     message_reference: None | models.MessageReference
-    components: None | models.Components
+    components: None | models.ActionRow.S
     sticker_ids: None | tuple[models.StickerID, ...]
     # files: None |
     payload_json: None | str

@@ -1,6 +1,9 @@
 from .application_command import ApplicationCommandABC
 from .channel import ChannelABC
-from .message import MessageABC
+from .message import (
+    MessageABC,
+    UpdateMessageReq,
+)
 from .thread import ThreadABC
 from .webhook import (
     WebhookAuthABC,

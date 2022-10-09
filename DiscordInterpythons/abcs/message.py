@@ -9,14 +9,24 @@ from DiscordInterpythons.models._shared import _BaseModel
 
 class UpdateMessageReq(_BaseModel):
     # https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
-    content: str
-    embeds: models.Embed.S
-    flags: models.Permissions
-    allowed_mentions: models.AllowedMention
-    components: models.Components
-    # files
-    payload_json: str
-    attachments: models.Attachment.S
+    content: None | str = None
+    embeds: None | models.Embed.S = None
+    flags: None | models.Permissions = None
+    allowed_mentions: None | models.AllowedMention = None
+    components: None | tuple[models.ActionRow, ...] = None
+    # files = None
+    payload_json: None | str = None
+    attachments: None | models.Attachment.S = None
+
+    _omit = {
+        "content",
+        "embeds",
+        "flags",
+        "allowed_mentions",
+        "components",
+        "payload_json",
+        "attachments",
+    }
 
 
 @dataclass

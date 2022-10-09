@@ -20,10 +20,6 @@ from .component import (
     SelectMenu,
     TextInput,
     ActionRow,
-    ActionRowComponent,
-    ActionRowComponents,
-    Component,
-    Components,
 )
 from .embed import (
     EmbedThumbnail,

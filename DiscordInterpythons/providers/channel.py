@@ -15,16 +15,35 @@ _BASE_URL = "https://discord.com/api/v9"
 
 @dataclass
 class ChannelAPI(abc.ChannelABC):
+    token: str
     channel_id: models.ChannelID
 
-    async def _request(self, *, method: Method, endpoint: str = "", payload: None | dict = None) -> dict:
-        async with aiohttp.ClientSession(raise_for_status=True) as session:
+    @property
+    def _header_auth(self) -> dict[str, str]:
+        return {"Authorization": f"Bot {self.token}"}
+
+    async def _request(
+            self,
+            *,
+            method: Method,
+            endpoint: str = "",
+            payload: None | dict = None,
+            respond: bool = True,
+    ) -> dict:
+        async with aiohttp.ClientSession(
+                headers={**self._header_auth},
+        ) as session:
             async with session.request(
                     method.value,
                     f"{_BASE_URL}/channels/{self.channel_id}{endpoint}",
                     json=payload,
             ) as resp:
-                return await resp.json()
+                if not (200 <= resp.status <= 299):
+                    raise AssertionError(
+                        f"Code: {resp.status}, URL: {_BASE_URL}/channels/{self.channel_id}/{endpoint}, Response: {await resp.text()}")
+                if respond:
+                    return await resp.json()
+                return {}
 
     async def read(self) -> models.Channel:
         result = await self._request(method=Method.GET)
@@ -36,7 +55,7 @@ class ChannelAPI(abc.ChannelABC):
     async def update(self, channel: abc.UpdateChannelReq) -> models.Channel:
         result = await self._request(
             method=Method.PATCH,
-            payload=channel.dict(),
+            payload=channel.dict_as_valid_json(),
         )
         return models.Channel(**result)
 
@@ -50,7 +69,7 @@ class ChannelAPI(abc.ChannelABC):
         result = await self._request(
             method=Method.POST,
             endpoint="/messages",
-            payload=message.dict(),
+            payload=message.dict_as_valid_json(),
         )
         return models.Message(**result)
 
@@ -72,7 +91,7 @@ class ChannelAPI(abc.ChannelABC):
         await self._request(
             method=Method.PUT,
             endpoint=f"/permissions/{permission_overwrite.id}",
-            payload=permission_overwrite.dict(),
+            payload=permission_overwrite.dict_as_valid_json(),
         )
 
     async def read_invites(self) -> models.Invite.S:
@@ -86,7 +105,7 @@ class ChannelAPI(abc.ChannelABC):
         result = await self._request(
             method=Method.POST,
             endpoint="/invites",
-            payload=invite.dict(),
+            payload=invite.dict_as_valid_json(),
         )
         return models.Invite(**result)
 

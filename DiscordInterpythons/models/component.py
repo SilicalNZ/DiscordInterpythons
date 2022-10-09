@@ -89,10 +89,4 @@ class ActionRow(_BaseModel):
     S = tuple["ActionRow", ...]
 
     type: ComponentType
-    components: ActionRowComponents
-
-
-ActionRowComponent = Button | SelectMenu | TextInput
-ActionRowComponents = tuple[ActionRowComponent, ...]
-Component = Button | SelectMenu | TextInput | ActionRow
-Components = tuple[Component, ...]
+    components: tuple[Button | SelectMenu | TextInput, ...]

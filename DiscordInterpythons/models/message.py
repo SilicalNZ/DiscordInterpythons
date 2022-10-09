@@ -11,7 +11,7 @@ from DiscordInterpythons.models.channel import Channel, ChannelMention
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.models.embed import Embed
 from DiscordInterpythons.models.reaction import Reaction
-from DiscordInterpythons.models.component import Components
+from DiscordInterpythons.models.component import ActionRow
 from DiscordInterpythons.models.sticker import Sticker, PartialSticker
 from DiscordInterpythons.models._shared import _BaseModel
 
@@ -64,7 +64,6 @@ class Message(_BaseModel):
 
     id: MessageID
     channel_id: ChannelID
-    guild_id: GuildID
     author: User
     member: None | GuildMember
     content: str
@@ -90,7 +89,7 @@ class Message(_BaseModel):
     referenced_message: None | Message
     interaction: None | MessageInteraction
     thread: None | Channel
-    components: Components
+    components: ActionRow.S
     sticker_items: None | PartialSticker.S
     stickers: None | Sticker.S
 

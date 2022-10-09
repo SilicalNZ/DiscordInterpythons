@@ -10,13 +10,9 @@ from DiscordInterpythons.abcs import application_command as abc
 from DiscordInterpythons.providers._shared import Method
 
 
-class DiscordToken(str):
-    pass
-
-
 @dataclass
 class ApplicationCommandAPI(abc.ApplicationCommandABC):
-    token: DiscordToken
+    token: str
     application_id: models.ApplicationID
     debug_guild_id: None | models.GuildID
     local_application_commands: abc.ApplicationCommand.S
@@ -24,7 +20,7 @@ class ApplicationCommandAPI(abc.ApplicationCommandABC):
     @classmethod
     def from_interaction_handler_class(
             cls,
-            token: DiscordToken,
+            token: str,
             application_id: None | models.ApplicationID,
             debug_guild_id: None | models.GuildID,
     ):
