@@ -59,7 +59,7 @@ class _InteractionHandlerMetaClass(type):
 
             assert handler
 
-            return await handler._call(interaction, "".join(handler[1:]))
+            return await handler._call(interaction, "".join(handler_id[1:]))
 
         assert True is False
 
