@@ -8,7 +8,7 @@ with open("requirements.txt") as fp:
 
 setuptools.setup(
     name="DiscordInterpythons",
-    version="0.5.1",
+    version="0.5.2",
     license="Anyone may use this, but the origin (this project) must be credited",
     url="https://gihtub.com/SilicalNZ/DiscordInterpythons",
     description="A Pythonic wrapper for the Discord API specifically servicing Interaction Bots",

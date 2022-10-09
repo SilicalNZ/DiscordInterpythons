@@ -18,6 +18,14 @@ class Button(_BaseModel):
     url: None | str
     disabled: None | bool
 
+    _omit = {
+        "label",
+        "emoji",
+        "custom_id",
+        "url",
+        "disabled",
+    }
+
 
 class SelectOption(_BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
@@ -30,6 +38,12 @@ class SelectOption(_BaseModel):
     emoji: None | PartialEmoji = None
     default: None | bool = None
 
+    _omit = {
+        "description",
+        "emoji",
+        "default",
+    }
+
 
 class SelectMenu(_BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
@@ -41,6 +55,13 @@ class SelectMenu(_BaseModel):
     min_values: None | int
     max_values: None | int
     disabled: None | bool
+
+    _omit = {
+        "placeholder",
+        "min_values",
+        "max_values",
+        "disabled",
+    }
 
 
 class TextInput(_BaseModel):
@@ -55,6 +76,11 @@ class TextInput(_BaseModel):
     required: bool
     value: str
     placeholder: str
+
+    _omit = {
+        "min_length",
+        "max_length",
+    }
 
 
 class ActionRow(_BaseModel):
