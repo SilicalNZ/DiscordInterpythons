@@ -86,8 +86,10 @@ class ApplicationCommandOption(_BaseModel):
             return True
         elif other.required != self.required:
             return True
+        elif len(other.options or []) != len(self.options or []):
+            return True
 
-        def sort_lamb(option: ApplicationCommandOption):
+        def sort_lamb(option: ApplicationCommandOption | ApplicationCommandOptionChoice):
             return option.name
 
         for x, y in zip(sorted(other.options or [], key=sort_lamb), sorted(self.options or [], key=sort_lamb)):
@@ -95,6 +97,18 @@ class ApplicationCommandOption(_BaseModel):
                 return True
             if x.is_different(y):
                 return True
+
+        if len(other.choices or []) != len(self.choices or []):
+            return True
+
+        for x, y in zip(sorted(other.choices or [], key=sort_lamb), sorted(self.choices or [], key=sort_lamb)):
+            if x.name != y.name:
+                return True
+            if x.is_different(y):
+                return True
+
+        if len(other.channel_types or []) != len(self.options or []):
+            return True
 
         for x, y in zip(sorted(other.channel_types or []), sorted(self.channel_types or [])):
             if x != y:
@@ -147,6 +161,8 @@ class ApplicationCommand(_BaseModel):
         if other.description != self.description:
             return True
         elif other.dm_permission != self.dm_permission:
+            return True
+        elif len(other.options or []) != len(self.options or []):
             return True
 
         def sort_lamb(option: ApplicationCommandOption):
