@@ -204,7 +204,7 @@ class WebhookAPI(abc.WebhookABC):
         result = await self._request(
             method=Method.PATCH,
             endpoint=f"/webhooks/{self.webhook_id}/{self.token}/messages/{message_id}",
-            payload=message.dict(),
+            payload=message.dict_as_valid_json(),
             params=params,
         )
 

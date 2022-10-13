@@ -13,6 +13,7 @@ from DiscordInterpythons import models
 
 class _InteractionHandlerMetaClass(type):
     _cls_storage: dict[typing.Type[InteractionHandlerClass], list[_Handler, ...]] = {}
+    _handlers: list[_Handler]
     _chat_input_handler_storage: dict[str, ChatInputHandler] = {}
     _button_handler_store: dict[str, ButtonHandler] = {}
 
@@ -26,13 +27,14 @@ class _InteractionHandlerMetaClass(type):
 
         mcs._cls_storage[cls] = []
         for name, method in attrs.items():
+            if isinstance(method, _Handler):
+                mcs._cls_storage[cls].append(method)
+
             if isinstance(method, ChatInputHandler) and not isinstance(method, SubCommandHandler):
                 mcs._chat_input_handler_storage[method.name] = method
-                mcs._cls_storage[cls].append(method)
 
             if isinstance(method, ButtonHandler):
                 mcs._button_handler_store[method.custom_id] = method
-                mcs._cls_storage[cls].append(method)
         return cls
 
     @classmethod
@@ -83,22 +85,8 @@ class _Handler:
 
 
 class ChatInputHandler(_Handler):
-    _private_parent_self: None | InteractionHandlerClass = None
     _sub_commands: dict[str, ChatInputHandler]
     _auto_completes: dict[str, AutoCompleteHandler]
-
-    @property
-    def _parent_self(self) -> None | InteractionHandlerClass:
-        return self._private_parent_self
-
-    @_parent_self.setter
-    def _parent_self(self, inst: InteractionHandlerClass):
-        self._private_parent_self = inst
-        for sub_command in self._sub_commands.values():
-            sub_command._parent_self = inst
-
-        for auto_complete in self._auto_completes.values():
-            auto_complete._parent_self = inst
 
     def __init__(
             self,
@@ -277,7 +265,6 @@ class AutoCompleteHandler(_Handler):
 
 class ButtonHandler(_Handler):
     handler: None | _button_handler = None
-
 
     def __init__(self, custom_id: str):
         self.custom_id = custom_id

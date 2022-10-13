@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from DiscordInterpythons.models.snowflake import ApplicationCommandID, ApplicationID, GuildID, Version
 from DiscordInterpythons.models.model_type import ApplicationCommandType, Locale, ApplicationCommandOptionType, ChannelTypes
 from DiscordInterpythons.models.flag import Permissions
@@ -18,6 +20,19 @@ class ApplicationCommandOptionChoice(_BaseModel):
     _omit = {
         "name_localizations",
     }
+
+    def is_different(self, other: ApplicationCommandOptionChoice) -> bool:
+        assert other.name == self.name
+
+        if other.value != self.value:
+            return True
+        elif _is_empty(other.name_localizations) != _is_empty(self.name_localizations):
+            return True
+        elif (other.name_localizations is not None and self.name_localizations is not None) \
+                and other.name_localizations != self.name_localizations:
+            return True
+
+        return False
 
 
 class ApplicationCommandOption(_BaseModel):
@@ -51,6 +66,48 @@ class ApplicationCommandOption(_BaseModel):
         "max_length",
         "autocomplete",
     }
+
+    def is_different(self, other: ApplicationCommandOption) -> bool:
+        assert other.name == self.name
+
+        if other.type != self.type:
+            return True
+        elif other.description != self.description:
+            return True
+        elif _is_empty(other.name_localizations) != _is_empty(self.name_localizations):
+            return True
+        elif (other.name_localizations is not None and self.name_localizations is not None) \
+                and other.name_localizations != self.name_localizations:
+            return True
+        elif _is_empty(other.description_localizations) != _is_empty(self.description_localizations):
+            return True
+        elif (other.description_localizations is not None and self.description_localizations is not None) \
+                and other.description_localizations != self.description_localizations:
+            return True
+        elif other.required != self.required:
+            return True
+
+        def sort_lamb(option: ApplicationCommandOption):
+            return option.name
+
+        for x, y in zip(sorted(other.options or [], key=sort_lamb), sorted(self.options or [], key=sort_lamb)):
+            if x.name != y.name:
+                return True
+            if x.is_different(y):
+                return True
+
+        for x, y in zip(sorted(other.channel_types or []), sorted(self.channel_types or [])):
+            if x != y:
+                return True
+
+        if other.min_value != self.min_value:
+            return True
+        elif other.max_value != self.max_value:
+            return True
+        elif other.autocomplete != self.autocomplete:
+            return True
+
+        return False
 
 
 class ApplicationCommand(_BaseModel):
@@ -89,18 +146,20 @@ class ApplicationCommand(_BaseModel):
 
         if other.description != self.description:
             return True
-        elif ((other.options is None and self.options is not None)
-                or (other.options is not None and self.options is None)
-                or ((other.options is not None and len(other.options) == 0)
-                    and (self.options is not None and len(self.options) == 0))):
-            return False
-        elif len(other.options) != len(other.options):
+        elif other.dm_permission != self.dm_permission:
             return True
 
         def sort_lamb(option: ApplicationCommandOption):
             return option.name
 
-        for x, y in zip(sorted(other.options, key=sort_lamb), sorted(other.options, key=sort_lamb)):
-            if x != y:
+        for x, y in zip(sorted(other.options or [], key=sort_lamb), sorted(self.options or [], key=sort_lamb)):
+            if x.name != y.name:
                 return True
+            if x.is_different(y):
+                return True
+
         return False
+
+
+def _is_empty(value: None | Sequence) -> bool:
+    return value is None or len(value) == 0

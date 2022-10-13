@@ -214,6 +214,8 @@ GuildFeatures = tuple[GuildFeature, ...]
 
 
 class InteractionResponseType(Enum):
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type
+
     PONG = 1
     CHANNEL_MESSAGE_WITH_SOURCE = 4
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5

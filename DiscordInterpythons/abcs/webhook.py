@@ -122,14 +122,10 @@ class WebhookAuthABC(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
 
-class DiscordToken(str):
-    pass
-
-
 @dataclass
 class WebhookABC(metaclass=abc.ABCMeta):
     webhook_id: models.WebhookID
-    token: DiscordToken
+    token: str
 
     # https://discord.com/developers/docs/resources/webhook#get-webhook-with-token
     @abc.abstractmethod
