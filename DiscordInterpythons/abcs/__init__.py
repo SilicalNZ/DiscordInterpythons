@@ -1,5 +1,11 @@
 from .application_command import ApplicationCommandABC
-from .channel import ChannelABC
+from .channel import (
+    ChannelABC,
+    UpdateChannelReq,
+    CreateChannelMessageReq,
+    CreateChannelInviteReq,
+    ReadThreadsResp,
+)
 from .message import (
     MessageABC,
     UpdateMessageReq,

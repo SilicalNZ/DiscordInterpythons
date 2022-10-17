@@ -101,7 +101,7 @@ class ChannelAPI(abc.ChannelABC):
         )
         return tuple(models.Invite(**i) for i in result)
 
-    async def create_invite(self, invite: abc.CreateChannelInvite) -> models.Invite:
+    async def create_invite(self, invite: abc.CreateChannelInviteReq) -> models.Invite:
         result = await self._request(
             method=Method.POST,
             endpoint="/invites",

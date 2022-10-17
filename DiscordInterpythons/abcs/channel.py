@@ -62,7 +62,7 @@ class CreateChannelMessageReq(_BaseModel):
     }
 
 
-class CreateChannelInvite(_BaseModel):
+class CreateChannelInviteReq(_BaseModel):
     max_age: int
     max_uses: int
     temporary: bool
@@ -128,7 +128,7 @@ class ChannelABC(metaclass=abc.ABCMeta):
 
     # https://discord.com/developers/docs/resources/channel#create-channel-invite
     @abc.abstractmethod
-    async def create_invite(self, invite: CreateChannelInvite) -> models.Invite:
+    async def create_invite(self, invite: CreateChannelInviteReq) -> models.Invite:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/channel#delete-channel-permission
