@@ -92,7 +92,7 @@ class InteractionResponseHandler:
                 embeds=(Embed(
                     description=content,
                     colour=colour,
-                ))
+                ),)
             )
         )
 
