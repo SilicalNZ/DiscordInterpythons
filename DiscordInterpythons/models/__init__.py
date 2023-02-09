@@ -35,12 +35,13 @@ from .emoji import (
     PartialEmoji,
     Emoji,
 )
-from .emoji_type import (
-    discord_emoji_converter,
-    discord_emoji_converter_inverse,
-    EmojiUnicodeType,
-    EmojiNameType,
-)
+# This is too slow
+# from .emoji_type import (
+#     discord_emoji_converter,
+#     discord_emoji_converter_inverse,
+#     EmojiUnicodeType,
+#     EmojiNameType,
+# )
 from .flag import (
     ChannelFlag,
     SystemChannelFlags,
