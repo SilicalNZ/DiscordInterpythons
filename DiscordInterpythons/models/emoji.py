@@ -2,10 +2,16 @@ from __future__ import annotations
 
 from DiscordInterpythons.models.snowflake import EmojiID, RoleID
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class PartialEmoji(_BaseModel):
+__all__ = (
+    "PartialEmoji",
+    "Emoji",
+)
+
+
+class PartialEmoji(BaseModel):
     S = tuple["PartialEmoji", ...]
 
     id: EmojiID
@@ -13,7 +19,7 @@ class PartialEmoji(_BaseModel):
     animated: bool
 
 
-class Emoji(_BaseModel):
+class Emoji(BaseModel):
     # https://discord.com/developers/docs/resources/emoji#emoji-object-emoji-structure
 
     S = tuple["Emoji", ...]

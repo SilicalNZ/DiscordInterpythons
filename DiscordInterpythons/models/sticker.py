@@ -3,10 +3,16 @@ from __future__ import annotations
 from DiscordInterpythons.models.model_type import StickerFormatType, StickerType
 from DiscordInterpythons.models.snowflake import StickerID, GuildID, StickerPackID
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class PartialSticker(_BaseModel):
+__all__ = (
+    "PartialSticker",
+    "Sticker",
+)
+
+
+class PartialSticker(BaseModel):
     # https://discord.com/developers/docs/resources/sticker#sticker-item-object-sticker-item-structure
 
     S = tuple["PartialSticker", ...]
@@ -16,7 +22,7 @@ class PartialSticker(_BaseModel):
     format_type: StickerFormatType
 
 
-class Sticker(_BaseModel):
+class Sticker(BaseModel):
     # https://discord.com/developers/docs/resources/sticker#sticker-object
 
     S = tuple["Sticker", ...]

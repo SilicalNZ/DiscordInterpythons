@@ -3,22 +3,42 @@ from __future__ import annotations
 from dataclasses import dataclass
 import abc
 
-from DiscordInterpythons import models
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.models.snowflake import (
+    ChannelID, MessageID, WebhookID, ThreadID, GuildID, InteractionID, ApplicationID
+)
+from DiscordInterpythons.models.flag import Permissions
+from DiscordInterpythons.models.message import Message
+from DiscordInterpythons.models.embed import Embed
+from DiscordInterpythons.models.allowed_mention import AllowedMention
+from DiscordInterpythons.models.component import ActionRow
+from DiscordInterpythons.models.attachment import Attachment
+from DiscordInterpythons.models.webhook import Webhook
+from DiscordInterpythons.models.interaction import InteractionToken
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class ExecuteWebhookReq(_BaseModel):
+__all__ = (
+    "WebhookAuthABC",
+    "WebhookABC",
+    "InteractionResponseABC",
+    "ExecuteWebhookReq",
+    "UpdateWebhookMessageReq",
+    "CreateFollowupReq",
+)
+
+
+class ExecuteWebhookReq(BaseModel):
     content: str
     username: None | str = None
     avatar_url: None | str = None
     tts: None | bool = None
-    embeds: None | models.Embed.S = None
-    allowed_mentions: None | models.AllowedMention = None
-    components: None | models.ActionRow.S = None
+    embeds: None | Embed.S = None
+    allowed_mentions: None | AllowedMention = None
+    components: None | ActionRow.S = None
     # files
     payload_json: str
-    attachments: None | models.Attachment.S = None
-    flags: None | models.Permissions = None
+    attachments: None | Attachment.S = None
+    flags: None | Permissions = None
     thread_name: None | str = None
 
     _omit = {
@@ -35,16 +55,16 @@ class ExecuteWebhookReq(_BaseModel):
     }
 
 
-class CreateFollowupReq(_BaseModel):
+class CreateFollowupReq(BaseModel):
     content: str
     tts: None | bool = None
-    embeds: None | models.Embed.S = None
-    allowed_mentions: None | models.AllowedMention = None
-    components: None | models.ActionRow.S = None
+    embeds: None | Embed.S = None
+    allowed_mentions: None | AllowedMention = None
+    components: None | ActionRow.S = None
     # files
     payload_json: str
-    attachments: None | models.Attachment.S = None
-    flags: None | models.Permissions = None
+    attachments: None | Attachment.S = None
+    flags: None | Permissions = None
     thread_name: None | str = None
 
     _omit = {
@@ -59,14 +79,14 @@ class CreateFollowupReq(_BaseModel):
     }
 
 
-class UpdateWebhookMessageReq(_BaseModel):
+class UpdateWebhookMessageReq(BaseModel):
     content: None | str
-    embeds: None | models.Embed.S = None
-    allowed_mentions: None | models.AllowedMention = None
-    components: None | models.ActionRow.S = None
+    embeds: None | Embed.S = None
+    allowed_mentions: None | AllowedMention = None
+    components: None | ActionRow.S = None
     # files
     payload_json: str
-    attachments: None | models.Attachment.S = None
+    attachments: None | Attachment.S = None
 
     _omit = {
         "content",
@@ -84,52 +104,52 @@ class WebhookAuthABC(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     async def create_webhook(
             self,
-            channel_id: models.ChannelID,
+            channel_id: ChannelID,
             name: str,
             avatar: None | str = None,
-    ) -> models.Webhook:
+    ) -> Webhook:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#get-channel-webhooks
     @abc.abstractmethod
-    async def read_channel_webhooks(self, channel_id: models.ChannelID) -> models.Webhook.S:
+    async def read_channel_webhooks(self, channel_id: ChannelID) -> Webhook.S:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#get-guild-webhooks
     @abc.abstractmethod
-    async def read_guild_webhooks(self, guild_id: models.GuildID) -> models.Webhook.S:
+    async def read_guild_webhooks(self, guild_id: GuildID) -> Webhook.S:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#get-webhook
     @abc.abstractmethod
-    async def read_webhook(self, webhook_id: models.WebhookID) -> models.Webhook:
+    async def read_webhook(self, webhook_id: WebhookID) -> Webhook:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#modify-webhook
     @abc.abstractmethod
     async def update_webhook(
             self,
-            webhook_id: models.WebhookID,
+            webhook_id: WebhookID,
             name: None | str = None,
             avatar: None | str = None,
-            channel_id: None | models.ChannelID = None,
-    ) -> models.Webhook:
+            channel_id: None | ChannelID = None,
+    ) -> Webhook:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#delete-webhook
     @abc.abstractmethod
-    async def delete_webhook(self, webhook_id: models.WebhookID) -> models.Webhook:
+    async def delete_webhook(self, webhook_id: WebhookID) -> Webhook:
         raise NotImplementedError()
 
 
 @dataclass
 class WebhookABC(metaclass=abc.ABCMeta):
-    webhook_id: models.WebhookID
+    webhook_id: WebhookID
     token: str
 
     # https://discord.com/developers/docs/resources/webhook#get-webhook-with-token
     @abc.abstractmethod
-    async def read_webhook(self) -> models.Webhook:
+    async def read_webhook(self) -> Webhook:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token
@@ -138,7 +158,7 @@ class WebhookABC(metaclass=abc.ABCMeta):
             self,
             name: None | str = None,
             avatar: None | str = None,
-    ) -> models.Webhook:
+    ) -> Webhook:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token
@@ -152,47 +172,47 @@ class WebhookABC(metaclass=abc.ABCMeta):
             self,
             message: ExecuteWebhookReq,
             wait: None | bool = None,
-            thread_id: None | models.ThreadID = None,
-    ) -> None | models.Message:
+            thread_id: None | ThreadID = None,
+    ) -> None | Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#get-webhook-message
     @abc.abstractmethod
     async def read_webhook_message(
             self,
-            message_id: models.MessageID,
-    ) -> models.Message:
+            message_id: MessageID,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     @abc.abstractmethod
     async def update_webhook_message(
             self,
-            message_id: models.MessageID,
+            message_id: MessageID,
             message: UpdateWebhookMessageReq,
-            thread_id: None | models.ThreadID = None,
-    ) -> models.Message:
+            thread_id: None | ThreadID = None,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/resources/webhook#delete-webhook-message
     @abc.abstractmethod
     async def delete_webhook_message(
             self,
-            message_id: models.MessageID,
-            thread_id: None | models.ThreadID = None,
+            message_id: MessageID,
+            thread_id: None | ThreadID = None,
     ):
         raise NotImplementedError()
 
 
 @dataclass
 class InteractionResponseABC(metaclass=abc.ABCMeta):
-    token: models.InteractionToken
+    token: InteractionToken
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
     @abc.abstractmethod
     async def create(
             self,
-            interaction_id: models.InteractionID,
+            interaction_id: InteractionID,
     ):
         raise NotImplementedError()
 
@@ -200,25 +220,25 @@ class InteractionResponseABC(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     async def read(
             self,
-            application_id: models.ApplicationID,
-    ) -> models.Message:
+            application_id: ApplicationID,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
     @abc.abstractmethod
     async def update(
             self,
-            application_id: models.ApplicationID,
+            application_id: ApplicationID,
             message: UpdateWebhookMessageReq,
-            thread_id: None | models.ThreadID = None,
-    ) -> models.Message:
+            thread_id: None | ThreadID = None,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response
     @abc.abstractmethod
     async def delete(
             self,
-            application_id: models.ApplicationID,
+            application_id: ApplicationID,
     ):
         raise NotImplementedError()
 
@@ -226,36 +246,36 @@ class InteractionResponseABC(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     async def create_followup(
             self,
-            application_id: models.ApplicationID,
+            application_id: ApplicationID,
             message: CreateFollowupReq,
-    ) -> models.Message:
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
     @abc.abstractmethod
     async def read_followup(
             self,
-            application_id: models.ApplicationID,
-            message_id: models.MessageID,
-    ) -> models.Message:
+            application_id: ApplicationID,
+            message_id: MessageID,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
     @abc.abstractmethod
     async def update_followup(
             self,
-            application_id: models.ApplicationID,
-            message_id: models.MessageID,
+            application_id: ApplicationID,
+            message_id: MessageID,
             message: UpdateWebhookMessageReq,
-            thread_id: None | models.ThreadID = None,
-    ) -> models.Message:
+            thread_id: None | ThreadID = None,
+    ) -> Message:
         raise NotImplementedError()
 
     # https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
     @abc.abstractmethod
     async def delete_followup(
             self,
-            application_id: models.ApplicationID,
-            message_id: models.MessageID,
+            application_id: ApplicationID,
+            message_id: MessageID,
     ):
         raise NotImplementedError()

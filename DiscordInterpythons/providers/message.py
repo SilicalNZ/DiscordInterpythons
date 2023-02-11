@@ -1,22 +1,31 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
 
 import aiohttp
 
-from DiscordInterpythons import models
-from DiscordInterpythons.abcs import message as abc
-from DiscordInterpythons.providers._shared import Method
+from DiscordInterpythons.models.snowflake import ChannelID, MessageID, UserID
+from DiscordInterpythons.models.model_type import AutoArchiveDuration
+from DiscordInterpythons.models.message import Message
+from DiscordInterpythons.models.user import User
+from DiscordInterpythons.models.channel import Channel
+from DiscordInterpythons.abcs.message import MessageABC, UpdateMessageReq
+from DiscordInterpythons.utils.http_method import Method
+
+
+__all__ = (
+    "MessageAPI",
+    "UpdateMessageReq",
+)
 
 
 _BASE_URL = "https://discord.com/api/v9"
 
 
 @dataclass
-class MessageAPI(abc.MessageABC):
-    channel_id: models.ChannelID
-    message_id: models.MessageID
+class MessageAPI(MessageABC):
+    channel_id: ChannelID
+    message_id: MessageID
     token: str
 
     @property
@@ -48,9 +57,9 @@ class MessageAPI(abc.MessageABC):
                     return await resp.json()
                 return {}
 
-    async def read(self) -> models.Message:
+    async def read(self) -> Message:
         result = await self._request(method=Method.GET)
-        return models.Message(**result)
+        return Message(**result)
     
     async def create_reaction(self, emoji: str):
         await self._request(
@@ -64,7 +73,7 @@ class MessageAPI(abc.MessageABC):
             endpoint=f"/reactions/{emoji}/@me",
         )
 
-    async def delete_user_reaction(self, user_id: models.UserID, emoji: str):
+    async def delete_user_reaction(self, user_id: UserID, emoji: str):
         await self._request(
             method=Method.DELETE,
             endpoint=f"/reactions/{emoji}/{user_id}",
@@ -73,9 +82,9 @@ class MessageAPI(abc.MessageABC):
     async def read_reactions_for_emoji(
             self,
             emoji: str,
-            after: None | models.UserID = None,
+            after: None | UserID = None,
             limit: None | int = None,
-    ) -> tuple[models.User]:
+    ) -> tuple[User]:
         params = {}
         if after is not None:
             params["after"] = after
@@ -87,7 +96,7 @@ class MessageAPI(abc.MessageABC):
             endpoint=f"/reactions/{emoji}",
             params=params or None,
         )
-        return tuple(models.User(**i) for i in result)
+        return tuple(User(**i) for i in result)
 
     async def delete_all_reactions(self):
         await self._request(
@@ -101,25 +110,25 @@ class MessageAPI(abc.MessageABC):
             endpoint=f"/reactions/{emoji}",
         )
 
-    async def update(self, message: abc.UpdateMessageReq) -> models.Message:
+    async def update(self, message: UpdateMessageReq) -> Message:
         result = await self._request(
             method=Method.PATCH,
             payload=message.dict_as_valid_json(),
         )
-        return models.Message(**result)
+        return Message(**result)
 
     async def delete(self):
         await self._request(
             method=Method.DELETE,
         )
 
-    async def create_crosspost(self) -> models.Message:
+    async def create_crosspost(self) -> Message:
         raise NotImplementedError()
 
     async def create_thread(
             self,
             name: str,
-            auto_archive_duration: models.AutoArchiveDuration | None = None,
+            auto_archive_duration: AutoArchiveDuration | None = None,
             rate_limit_per_user: int | None = None,
-    ) -> models.Channel:
+    ) -> Channel:
         raise NotImplementedError()

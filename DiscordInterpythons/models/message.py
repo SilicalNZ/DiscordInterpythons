@@ -13,10 +13,18 @@ from DiscordInterpythons.models.embed import Embed
 from DiscordInterpythons.models.reaction import Reaction
 from DiscordInterpythons.models.component import ActionRow
 from DiscordInterpythons.models.sticker import Sticker, PartialSticker
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class MessageInteraction(_BaseModel):
+__all__ = (
+    "MessageInteraction",
+    "MessageReference",
+    "MessageActivity",
+    "Message",
+)
+
+
+class MessageInteraction(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
 
     id: InteractionID
@@ -30,7 +38,7 @@ class MessageInteraction(_BaseModel):
     }
 
 
-class MessageReference(_BaseModel):
+class MessageReference(BaseModel):
     # https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
 
     message_id: None | MessageID
@@ -46,7 +54,7 @@ class MessageReference(_BaseModel):
     }
 
 
-class MessageActivity(_BaseModel):
+class MessageActivity(BaseModel):
     # https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
 
     type: MessageActivityType
@@ -57,7 +65,7 @@ class MessageActivity(_BaseModel):
     }
 
 
-class Message(_BaseModel):
+class Message(BaseModel):
     # https://discord.com/developers/docs/resources/channel#message-object
 
     S = tuple["Message", ...]

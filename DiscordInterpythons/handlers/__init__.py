@@ -1,11 +1,2 @@
-from .handler import (
-    InteractionHandlerClass,
-    ChatInputHandler,
-    SubCommandHandler,
-    AutoCompleteHandler,
-    ButtonHandler,
-)
-from .middleware import (
-    handle_interaction,
-    verify_key,
-)
+from .middleware.middleware import *
+from .handler import *

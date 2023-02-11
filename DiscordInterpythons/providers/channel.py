@@ -5,18 +5,34 @@ from datetime import datetime
 
 import aiohttp
 
-from DiscordInterpythons import models
-from DiscordInterpythons.abcs import channel as abc
-from DiscordInterpythons.providers._shared import Method
+from DiscordInterpythons.models.snowflake import ChannelID, MessageID, UserID, UserOrRoleID
+from DiscordInterpythons.models.model_type import AutoArchiveDuration, ChannelType
+from DiscordInterpythons.models.message import Message
+from DiscordInterpythons.models.channel import Channel, FollowedChannel
+from DiscordInterpythons.models.permission_overwrite import PermissionOverwrite
+from DiscordInterpythons.models.invite import Invite
+from DiscordInterpythons.abcs.channel import (
+    ChannelABC, UpdateChannelReq, CreateChannelMessageReq, CreateChannelInviteReq, ReadThreadsResp
+)
+from DiscordInterpythons.utils.http_method import Method
+
+
+__all__ = (
+    "ChannelAPI",
+    "UpdateChannelReq",
+    "CreateChannelMessageReq",
+    "CreateChannelInviteReq",
+    "ReadThreadsResp"
+)
 
 
 _BASE_URL = "https://discord.com/api/v9"
 
 
 @dataclass
-class ChannelAPI(abc.ChannelABC):
+class ChannelAPI(ChannelABC):
     token: str
-    channel_id: models.ChannelID
+    channel_id: ChannelID
 
     @property
     def _header_auth(self) -> dict[str, str]:
@@ -45,19 +61,19 @@ class ChannelAPI(abc.ChannelABC):
                     return await resp.json()
                 return {}
 
-    async def read(self) -> models.Channel:
+    async def read(self) -> Channel:
         result = await self._request(method=Method.GET)
-        return models.Channel(**result)
+        return Channel(**result)
 
     async def delete(self):
         await self._request(method=Method.DELETE)
 
-    async def update(self, channel: abc.UpdateChannelReq) -> models.Channel:
+    async def update(self, channel: UpdateChannelReq) -> Channel:
         result = await self._request(
             method=Method.PATCH,
             payload=channel.dict_as_valid_json(),
         )
-        return models.Channel(**result)
+        return Channel(**result)
 
     async def create_typing_indicator(self):
         await self._request(
@@ -65,119 +81,119 @@ class ChannelAPI(abc.ChannelABC):
             endpoint="/typing",
         )
 
-    async def create_message(self, message: abc.CreateChannelMessageReq) -> models.Message:
+    async def create_message(self, message: CreateChannelMessageReq) -> Message:
         result = await self._request(
             method=Method.POST,
             endpoint="/messages",
             payload=message.dict_as_valid_json(),
         )
-        return models.Message(**result)
+        return Message(**result)
 
-    async def read_messages(self) -> models.Message.S:
+    async def read_messages(self) -> Message.S:
         result = await self._request(
             method=Method.GET,
             endpoint="/messages",
         )
-        return tuple(models.Message(**i) for i in result)
+        return tuple(Message(**i) for i in result)
 
-    async def delete_messages(self, *message_ids: tuple[models.MessageID]):
+    async def delete_messages(self, *message_ids: tuple[MessageID]):
         await self._request(
             method=Method.DELETE,
             endpoint="/messages/bulk-delete",
             payload={"messages": message_ids},
         )
 
-    async def update_permissions(self, permission_overwrite: models.PermissionOverwrite):
+    async def update_permissions(self, permission_overwrite: PermissionOverwrite):
         await self._request(
             method=Method.PUT,
             endpoint=f"/permissions/{permission_overwrite.id}",
             payload=permission_overwrite.dict_as_valid_json(),
         )
 
-    async def read_invites(self) -> models.Invite.S:
+    async def read_invites(self) -> Invite.S:
         result = await self._request(
             method=Method.GET,
             endpoint="/invites",
         )
-        return tuple(models.Invite(**i) for i in result)
+        return tuple(Invite(**i) for i in result)
 
-    async def create_invite(self, invite: abc.CreateChannelInviteReq) -> models.Invite:
+    async def create_invite(self, invite: CreateChannelInviteReq) -> Invite:
         result = await self._request(
             method=Method.POST,
             endpoint="/invites",
             payload=invite.dict_as_valid_json(),
         )
-        return models.Invite(**result)
+        return Invite(**result)
 
-    async def delete_permissions(self, overwrite_id: models.UserOrRoleID):
+    async def delete_permissions(self, overwrite_id: UserOrRoleID):
         await self._request(
             method=Method.DELETE,
             endpoint=f"/permissions/{overwrite_id}",
         )
 
-    async def create_follow_channel(self, webhook_channel_id: models.ChannelID) -> models.FollowedChannel:
+    async def create_follow_channel(self, webhook_channel_id: ChannelID) -> FollowedChannel:
         result = await self._request(
             method=Method.POST,
             endpoint="/followers",
             payload={"webhook_channel_id": webhook_channel_id},
         )
-        return models.FollowedChannel(**result)
+        return FollowedChannel(**result)
 
-    async def create_pinned_message(self, message_id: models.MessageID):
+    async def create_pinned_message(self, message_id: MessageID):
         await self._request(
             method=Method.PUT,
             endpoint=f"/pins/{message_id}",
         )
 
-    async def read_pinned_messages(self) -> models.Message.S:
+    async def read_pinned_messages(self) -> Message.S:
         result = await self._request(
             method=Method.GET,
             endpoint="/pins",
         )
-        return tuple(models.Message(**i) for i in result)
+        return tuple(Message(**i) for i in result)
 
-    async def delete_pinned_message(self, message_id: models.MessageID):
+    async def delete_pinned_message(self, message_id: MessageID):
         await self._request(
             method=Method.DELETE,
             endpoint=f"/pins/{message_id}",
         )
 
-    async def update_group_channel_user(self, user_id: models.UserID):
+    async def update_group_channel_user(self, user_id: UserID):
         raise NotImplementedError()
 
-    async def delete_group_channel_user(self, user_id: models.UserID):
+    async def delete_group_channel_user(self, user_id: UserID):
         raise NotImplementedError()
 
     async def create_thread(
             self,
             name: str,
-            auto_archive_duration: models.AutoArchiveDuration | None = None,
-            thread_type: models.ChannelType | None = None,
+            auto_archive_duration: AutoArchiveDuration | None = None,
+            thread_type: ChannelType | None = None,
             invitable: bool | None = None,
             rate_limit_per_user: int | None = None,
-    ) -> models.Channel:
+    ) -> Channel:
         raise NotImplementedError()
 
-    # async def create_thread_from_forum_channel(self) -> models.Channel:
+    # async def create_thread_from_forum_channel(self) -> Channel:
     #     raise NotImplementedError()
 
     async def read_public_archived_threads(
             self,
             before: datetime | None = None,
             limit: int | None = None,
-    ) -> abc.ReadThreadsResp:
+    ) -> ReadThreadsResp:
         raise NotImplementedError()
 
     async def read_private_archived_threads(
             self,
             before: datetime | None = None,
             limit: int | None = None,
-    ) -> abc.ReadThreadsResp:
+    ) -> ReadThreadsResp:
         raise NotImplementedError()
 
     async def read_joined_archived_threads(
             self,
             before: datetime | None = None,
             limit: int | None = None,
-    ) -> abc.ReadThreadsResp:
+    ) -> ReadThreadsResp:
         raise NotImplementedError()

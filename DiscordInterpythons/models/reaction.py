@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 from DiscordInterpythons.models.emoji import PartialEmoji
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class Reaction(_BaseModel):
+__all__ = (
+    "Reaction",
+)
+
+
+class Reaction(BaseModel):
     # https://discord.com/developers/docs/resources/channel#reaction-object-reaction-structure
 
     S = tuple["Reaction", ...]
@@ -12,4 +17,3 @@ class Reaction(_BaseModel):
     count: int
     me: bool
     emoji: PartialEmoji
-

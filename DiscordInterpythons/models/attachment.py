@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 from DiscordInterpythons.models.snowflake import AttachmentID
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class Attachment(_BaseModel):
+__all__ = (
+    "Attachment",
+)
+
+
+class Attachment(BaseModel):
     # https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
 
     S = tuple["Attachment", ...]

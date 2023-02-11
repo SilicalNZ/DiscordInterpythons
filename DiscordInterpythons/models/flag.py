@@ -1,3 +1,12 @@
+__all__ = (
+    "ChannelFlag",
+    "SystemChannelFlags",
+    "MessageFlags",
+    "Permissions",
+    "UserFlags",
+)
+
+
 class _BitField(int):
     def bitwise_matches(self, match_against: int) -> bool:
         x = 1 << match_against

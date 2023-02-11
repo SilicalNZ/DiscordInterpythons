@@ -3,21 +3,28 @@ from __future__ import annotations
 from DiscordInterpythons.models.model_type import WebhookType
 from DiscordInterpythons.models.snowflake import WebhookID, GuildID, ChannelID, ApplicationID
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class WebhookPartialGuild(_BaseModel):
+__all__ = (
+    "WebhookPartialGuild",
+    "WebhookPartialChannel",
+    "Webhook",
+)
+
+
+class WebhookPartialGuild(BaseModel):
     id: GuildID
     name: str
     icon: str
 
 
-class WebhookPartialChannel(_BaseModel):
+class WebhookPartialChannel(BaseModel):
     id: ChannelID
     name: str
 
 
-class Webhook(_BaseModel):
+class Webhook(BaseModel):
     S = tuple["Webhook", ...]
 
     id: WebhookID

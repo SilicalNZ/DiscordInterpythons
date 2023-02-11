@@ -2,10 +2,16 @@ from __future__ import annotations
 
 from DiscordInterpythons.models.snowflake import BotID, IntegrationID, RoleID
 from DiscordInterpythons.models.flag import Permissions
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class RoleTag(_BaseModel):
+__all__ = (
+    "RoleTag",
+    "Role",
+)
+
+
+class RoleTag(BaseModel):
     # https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
 
     S = tuple["RoleTag", ...]
@@ -25,7 +31,7 @@ class RoleTag(_BaseModel):
     }
 
 
-class Role(_BaseModel):
+class Role(BaseModel):
     # https://discord.com/developers/docs/topics/permissions#role-object-role-structure
 
     S = tuple["Role", ...]

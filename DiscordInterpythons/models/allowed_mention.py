@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from DiscordInterpythons.models.snowflake import RoleID, UserID
 from DiscordInterpythons.models.model_type import AllowedMentionType
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class AllowedMention(_BaseModel):
+__all__ = (
+    "AllowedMention",
+)
+
+
+class AllowedMention(BaseModel):
     # https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure
 
     S = tuple["AllowedMention", ...]

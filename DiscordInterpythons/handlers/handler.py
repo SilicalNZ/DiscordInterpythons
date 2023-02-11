@@ -8,7 +8,32 @@ import inspect
 
 from pydantic import validate_arguments
 
-from DiscordInterpythons import models
+
+from DiscordInterpythons.models.interaction import Interaction, InteractionResponse
+from DiscordInterpythons.models.model_type import (
+    InteractionType,
+    ApplicationCommandOptionType,
+    ComponentType,
+    ApplicationCommandType,
+    ButtonStyleType,
+)
+from DiscordInterpythons.models.application_command import ApplicationCommand, ApplicationCommandOption
+from DiscordInterpythons.models.interaction_data import InteractionDataOption
+from DiscordInterpythons.models.emoji import PartialEmoji
+from DiscordInterpythons.models.component import Button
+from DiscordInterpythons.models.user import User
+from DiscordInterpythons.models.channel import Channel
+from DiscordInterpythons.models.role import Role
+from DiscordInterpythons.models.attachment import Attachment
+
+
+__all__ = (
+    "InteractionHandlerClass",
+    "ChatInputHandler",
+    "SubCommandHandler",
+    "AutoCompleteHandler",
+    "ButtonHandler",
+)
 
 
 class _InteractionHandlerMetaClass(type):
@@ -43,18 +68,18 @@ class _InteractionHandlerMetaClass(type):
             chat_input._parent_self = inst
 
     @classmethod
-    async def call(mcs, interaction: models.Interaction) -> models.InteractionResponse:
+    async def call(mcs, interaction: Interaction) -> InteractionResponse:
         if interaction.type in (
-                models.InteractionType.APPLICATION_COMMAND,
-                models.InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE,
+                InteractionType.APPLICATION_COMMAND,
+                InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE,
         ):
             handler = mcs._chat_input_handler_storage.get(interaction.data.name)
 
             assert handler
 
             return await handler._call(interaction)
-        elif interaction.type == models.InteractionType.MESSAGE_COMPONENT \
-                and interaction.data.component_type == models.ComponentType.BUTTON:
+        elif interaction.type == InteractionType.MESSAGE_COMPONENT \
+                and interaction.data.component_type == ComponentType.BUTTON:
             handler_id = interaction.data.custom_id.split(":")
 
             handler = mcs._button_handler_store.get(handler_id[0])
@@ -66,8 +91,8 @@ class _InteractionHandlerMetaClass(type):
         assert True is False
 
     @classmethod
-    def generate_application_commands(mcs) -> models.ApplicationCommand.S:
-        application_commands: list[models.ApplicationCommand] = []
+    def generate_application_commands(mcs) -> ApplicationCommand.S:
+        application_commands: list[ApplicationCommand] = []
 
         for key, value in mcs._chat_input_handler_storage.items():
             application_commands.append(value._generate_application_command())
@@ -109,9 +134,9 @@ class ChatInputHandler(_Handler):
 
     async def _call(
             self,
-            interaction: models.Interaction,
-            data_option: None | models.InteractionDataOption = None,
-    ) -> models.InteractionResponse:
+            interaction: Interaction,
+            data_option: None | InteractionDataOption = None,
+    ) -> InteractionResponse:
         assert interaction.data is not None
 
         options: dict[str, Any] = {}
@@ -121,8 +146,8 @@ class ChatInputHandler(_Handler):
             if option.focused:
                 return await self._auto_completes[option.name]._call(interaction, iterative_options, option.value)
             elif (
-                    option.type == models.ApplicationCommandOptionType.SUB_COMMAND_GROUP
-                    or option.type == models.ApplicationCommandOptionType.SUB_COMMAND
+                    option.type == ApplicationCommandOptionType.SUB_COMMAND_GROUP
+                    or option.type == ApplicationCommandOptionType.SUB_COMMAND
             ):
                 return await self._sub_commands[option.name]._call(interaction, option)
 
@@ -130,7 +155,7 @@ class ChatInputHandler(_Handler):
 
         return await self.application_command(self._parent_self, interaction, **options)
 
-    def _generate_application_command_options(self) -> tuple[models.ApplicationCommandOption, ...]:
+    def _generate_application_command_options(self) -> tuple[ApplicationCommandOption, ...]:
         description, param_descriptions = _doc_parser(self.application_command.__doc__)
 
         func_annotations = inspect.get_annotations(self.application_command, eval_str=True)
@@ -170,21 +195,21 @@ class ChatInputHandler(_Handler):
                 print(f"No doc for {param}")
                 param_description = ""
 
-            options.append(models.ApplicationCommandOption(
+            options.append(ApplicationCommandOption(
                 type=option_type,
                 name=param,
                 description=param_description,
                 required=required,
                 autocomplete=(
                     param in self._auto_completes
-                    and option_type == models.ApplicationCommandOptionType.STRING
+                    and option_type == ApplicationCommandOptionType.STRING
                 ) or None
             ))
 
         for key, value in self._sub_commands.items():
-            options.append(models.ApplicationCommandOption(
-                type=models.ApplicationCommandOptionType.SUB_COMMAND
-                if len(value._sub_commands) == 0 else models.ApplicationCommandOptionType.SUB_COMMAND_GROUP,
+            options.append(ApplicationCommandOption(
+                type=ApplicationCommandOptionType.SUB_COMMAND
+                if len(value._sub_commands) == 0 else ApplicationCommandOptionType.SUB_COMMAND_GROUP,
                 name=key,
                 description=value.description[0],
                 options=value._generate_application_command_options(),
@@ -192,9 +217,9 @@ class ChatInputHandler(_Handler):
 
         return tuple(options)
 
-    def _generate_application_command(self) -> models.ApplicationCommand:
-        return models.ApplicationCommand(
-            type=models.ApplicationCommandType.CHAT_INPUT,
+    def _generate_application_command(self) -> ApplicationCommand:
+        return ApplicationCommand(
+            type=ApplicationCommandType.CHAT_INPUT,
             name=self.name,
             description=self.description[0],
             options=self._generate_application_command_options(),
@@ -256,10 +281,10 @@ class AutoCompleteHandler(_Handler):
 
     async def _call(
             self,
-            interaction: models.Interaction,
-            options: models.InteractionDataOption.S,
+            interaction: Interaction,
+            options: InteractionDataOption.S,
             value: str,
-    ) -> models.InteractionResponse:
+    ) -> InteractionResponse:
         return await self.handler(self._parent_self, interaction, {i.name: i for i in options}, value)
 
 
@@ -276,22 +301,22 @@ class ButtonHandler(_Handler):
 
     async def _call(
             self,
-            interaction: models.Interaction,
+            interaction: Interaction,
             custom_id: str,
-    ) -> models.InteractionResponse:
+    ) -> InteractionResponse:
         return await self.handler(self._parent_self, interaction, custom_id)
 
     def build(
             self,
             custom_id: str,
             label: str,
-            emoji: models.PartialEmoji = None,
-            style: models.ButtonStyleType = models.ButtonStyleType.Primary,
+            emoji: PartialEmoji = None,
+            style: ButtonStyleType = ButtonStyleType.Primary,
             url: str = None,
             disabled: bool = False,
-    ) -> models.Button:
-        return models.Button(
-            type=models.ComponentType.BUTTON,
+    ) -> Button:
+        return Button(
+            type=ComponentType.BUTTON,
             style=style,
             label=label,
             emoji=emoji,
@@ -302,31 +327,31 @@ class ButtonHandler(_Handler):
 
 
 _auto_complete_handler = Callable[
-    [InteractionHandlerClass, models.Interaction, dict[str, models.InteractionDataOption], str],
-    Coroutine[Any, Any, None | models.InteractionResponse]
+    [InteractionHandlerClass, Interaction, dict[str, InteractionDataOption], str],
+    Coroutine[Any, Any, None | InteractionResponse]
 ]
 
 
 _button_handler = Callable[
-    [InteractionHandlerClass, models.Interaction, str],
-    Coroutine[Any, Any, None | models.InteractionResponse]
+    [InteractionHandlerClass, Interaction, str],
+    Coroutine[Any, Any, None | InteractionResponse]
 ]
 
 
 _application_command_handler = Callable[
-    [InteractionHandlerClass, models.Interaction, tuple[Any, ...], dict[str, Any]],
-    Coroutine[Any, Any, None | models.InteractionResponse]
+    [InteractionHandlerClass, Interaction, tuple[Any, ...], dict[str, Any]],
+    Coroutine[Any, Any, None | InteractionResponse]
 ]
 
 _application_command_option_map = {
-    str: models.ApplicationCommandOptionType.STRING,
-    int: models.ApplicationCommandOptionType.INTEGER,
-    bool: models.ApplicationCommandOptionType.BOOLEAN,
-    models.User: models.ApplicationCommandOptionType.USER,
-    models.Channel: models.ApplicationCommandOptionType.CHANNEL,
-    models.Role: models.ApplicationCommandOptionType.ROLE,
-    float: models.ApplicationCommandOptionType.NUMBER,
-    models.Attachment: models.ApplicationCommandOptionType.ATTACHMENT,
+    str: ApplicationCommandOptionType.STRING,
+    int: ApplicationCommandOptionType.INTEGER,
+    bool: ApplicationCommandOptionType.BOOLEAN,
+    User: ApplicationCommandOptionType.USER,
+    Channel: ApplicationCommandOptionType.CHANNEL,
+    Role: ApplicationCommandOptionType.ROLE,
+    float: ApplicationCommandOptionType.NUMBER,
+    Attachment: ApplicationCommandOptionType.ATTACHMENT,
 }
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 from DiscordInterpythons.models.snowflake import GuildID, ChannelID, RoleID
 from DiscordInterpythons.models.model_type import (
     GuildFeatures,
@@ -15,7 +15,16 @@ from DiscordInterpythons.models.user import User
 from DiscordInterpythons.models.guild_scheduled_event import GuildScheduledEvent
 
 
-class InvitePartialGuild(_BaseModel):
+__all__ = (
+    "InvitePartialGuild",
+    "InvitePartialChannel",
+    "InvitePartialMember",
+    "InviteStageInstance",
+    "Invite",
+)
+
+
+class InvitePartialGuild(BaseModel):
     # https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
 
     id: GuildID
@@ -31,7 +40,7 @@ class InvitePartialGuild(_BaseModel):
     premium_subscription_count: None | int
 
 
-class InvitePartialChannel(_BaseModel):
+class InvitePartialChannel(BaseModel):
     # https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
 
     id: ChannelID
@@ -39,7 +48,7 @@ class InvitePartialChannel(_BaseModel):
     type: ChannelType
 
 
-class InvitePartialMember(_BaseModel):
+class InvitePartialMember(BaseModel):
     # https://discord.com/developers/docs/resources/invite#invite-stage-instance-object-example-invite-stage-instance
 
     S = tuple["InvitePartialMember", ...]
@@ -57,7 +66,7 @@ class InvitePartialMember(_BaseModel):
         return self.roles
 
 
-class InviteStageInstance(_BaseModel):
+class InviteStageInstance(BaseModel):
     # https://discord.com/developers/docs/resources/invite#invite-stage-instance-object-invite-stage-instance-structure
 
     members: InvitePartialMember.S
@@ -66,7 +75,7 @@ class InviteStageInstance(_BaseModel):
     topic: str
 
 
-class Invite(_BaseModel):
+class Invite(BaseModel):
     # https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
 
     S = tuple["Invite", ...]

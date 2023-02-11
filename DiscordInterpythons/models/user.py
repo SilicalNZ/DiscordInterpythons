@@ -3,10 +3,15 @@ from __future__ import annotations
 from DiscordInterpythons.models.model_type import Locale, UserPremiumTypes
 from DiscordInterpythons.models.snowflake import UserID
 from DiscordInterpythons.models.flag import UserFlags
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class User(_BaseModel):
+__all__ = (
+    "User",
+)
+
+
+class User(BaseModel):
     # https://discord.com/developers/docs/resources/user#user-object
 
     S = tuple["User", ...]

@@ -11,15 +11,23 @@ from DiscordInterpythons.models.allowed_mention import AllowedMention
 from DiscordInterpythons.models.flag import MessageFlags
 from DiscordInterpythons.models.component import ActionRow, Button, SelectMenu, TextInput
 from DiscordInterpythons.models.attachment import Attachment
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 from DiscordInterpythons.models.application_command import ApplicationCommandOptionChoice
+
+
+__all__ = (
+    "InteractionToken",
+    "InteractionCallbackData",
+    "InteractionResponse",
+    "Interaction",
+)
 
 
 class InteractionToken(str):
     pass
 
 
-class InteractionCallbackData(_BaseModel):
+class InteractionCallbackData(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure
 
     tts: None | bool = None
@@ -52,7 +60,7 @@ class InteractionCallbackData(_BaseModel):
     }
 
 
-class InteractionResponse(_BaseModel):
+class InteractionResponse(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure
 
     type: InteractionResponseType
@@ -163,7 +171,7 @@ class InteractionResponseHandler:
         return result
 
 
-class Interaction(_BaseModel):
+class Interaction(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 
     id: InteractionID

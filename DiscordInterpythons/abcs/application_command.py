@@ -1,7 +1,12 @@
 import abc
 from dataclasses import dataclass
 
-from DiscordInterpythons.models import ApplicationCommand
+from DiscordInterpythons.models.application_command import ApplicationCommand
+
+
+__all__ = (
+    "ApplicationCommandABC",
+)
 
 
 @dataclass

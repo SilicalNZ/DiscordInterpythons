@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+__all__ = (
+    "VoiceRegion",
+    "WelcomeScreenChannel",
+    "WelcomeScreen",
+    "Guild",
+)
+
+
 from DiscordInterpythons.models.model_type import (
     VerificationLevel,
     MessageNotificationLevel,
@@ -16,10 +24,10 @@ from DiscordInterpythons.models.permission_overwrite import Permissions
 from DiscordInterpythons.models.role import Role
 from DiscordInterpythons.models.emoji import Emoji
 from DiscordInterpythons.models.sticker import Sticker
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class VoiceRegion(_BaseModel):
+class VoiceRegion(BaseModel):
     # https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
 
     id: VoiceRegionID
@@ -29,7 +37,7 @@ class VoiceRegion(_BaseModel):
     custom: bool
 
 
-class WelcomeScreenChannel(_BaseModel):
+class WelcomeScreenChannel(BaseModel):
     # https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
 
     S = tuple["WelcomeScreenChannel", ...]
@@ -40,14 +48,14 @@ class WelcomeScreenChannel(_BaseModel):
     emoji_name: None | str
 
 
-class WelcomeScreen(_BaseModel):
+class WelcomeScreen(BaseModel):
     # https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-structure
 
     description: None | str
     welcome_channels: WelcomeScreenChannel.S
 
 
-class Guild(_BaseModel):
+class Guild(BaseModel):
     # https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
 
     S = tuple["Guild", ...]

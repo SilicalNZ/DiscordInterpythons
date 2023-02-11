@@ -8,11 +8,21 @@ from DiscordInterpythons.models.role import Role
 from DiscordInterpythons.models.channel import Channel
 from DiscordInterpythons.models.message import Message
 from DiscordInterpythons.models.attachment import Attachment
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 from DiscordInterpythons.models.component import SelectOption, ActionRow
 
 
-class InteractionDataOption(_BaseModel):
+__all__ = (
+    "InteractionDataOption",
+    "InteractionResolvedData",
+    "InteractionData",
+    "InteractionDataMessageComponent",
+    "InteractionDataModalSubmit",
+    "InteractionDataStructures",
+)
+
+
+class InteractionDataOption(BaseModel):
     # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure
 
     S = tuple["InteractionDataOption", ...]
@@ -30,7 +40,7 @@ class InteractionDataOption(_BaseModel):
     }
 
 
-class InteractionResolvedData(_BaseModel):
+class InteractionResolvedData(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
 
     users: None | User.S
@@ -50,7 +60,7 @@ class InteractionResolvedData(_BaseModel):
     }
 
 
-class InteractionData(_BaseModel):
+class InteractionData(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure
 
     id: ApplicationCommandID
@@ -80,7 +90,7 @@ class InteractionData(_BaseModel):
     }
 
 
-class InteractionDataMessageComponent(_BaseModel):
+class InteractionDataMessageComponent(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure
 
     custom_id: str
@@ -88,7 +98,7 @@ class InteractionDataMessageComponent(_BaseModel):
     values: None | SelectOption.S
 
 
-class InteractionDataModalSubmit(_BaseModel):
+class InteractionDataModalSubmit(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
 
     custom_id: str

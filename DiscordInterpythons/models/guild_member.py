@@ -5,10 +5,16 @@ from datetime import datetime
 from DiscordInterpythons.models.snowflake import RoleID
 from DiscordInterpythons.models.flag import Permissions
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class GuildMember(_BaseModel):
+__all__ = (
+    "GuildMember",
+    "PartialGuildMember",
+)
+
+
+class GuildMember(BaseModel):
     # https://discord.com/developers/docs/resources/guild#guild-member-object
 
     S = tuple["GuildMember", ...]
@@ -40,5 +46,5 @@ class GuildMember(_BaseModel):
     }
 
 
-class PartialGuildMember(_BaseModel):
+class PartialGuildMember(BaseModel):
     S = tuple["PartialGuildMember", ...]

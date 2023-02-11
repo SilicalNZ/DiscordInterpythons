@@ -7,6 +7,3 @@ class Method(str, Enum):
     DELETE = "DELETE"
     PATCH = "PATCH"
     PUT = "PUT"
-
-
-# TODO: Audit Log Reason

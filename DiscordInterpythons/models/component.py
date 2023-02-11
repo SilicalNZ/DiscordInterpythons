@@ -2,10 +2,19 @@ from __future__ import annotations
 
 from DiscordInterpythons.models.model_type import ComponentType, ButtonStyleType, TextInputStyleType
 from DiscordInterpythons.models.emoji import PartialEmoji
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class Button(_BaseModel):
+__all__ = (
+    "Button",
+    "SelectOption",
+    "SelectMenu",
+    "TextInput",
+    "ActionRow",
+)
+
+
+class Button(BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#button-object
 
     S = tuple["Button", ...]
@@ -27,7 +36,7 @@ class Button(_BaseModel):
     }
 
 
-class SelectOption(_BaseModel):
+class SelectOption(BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
 
     S = tuple["SelectOption", ...]
@@ -45,7 +54,7 @@ class SelectOption(_BaseModel):
     }
 
 
-class SelectMenu(_BaseModel):
+class SelectMenu(BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
 
     type: ComponentType
@@ -64,7 +73,7 @@ class SelectMenu(_BaseModel):
     }
 
 
-class TextInput(_BaseModel):
+class TextInput(BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure
 
     type: ComponentType
@@ -83,7 +92,7 @@ class TextInput(_BaseModel):
     }
 
 
-class ActionRow(_BaseModel):
+class ActionRow(BaseModel):
     # https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
 
     S = tuple["ActionRow", ...]

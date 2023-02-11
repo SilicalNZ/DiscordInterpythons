@@ -2,12 +2,24 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 from DiscordInterpythons.models.model_type import EmbedType
 
 
+__all__ = (
+    "EmbedThumbnail",
+    "EmbedVideo",
+    "EmbedImage",
+    "EmbedFooter",
+    "EmbedProvider",
+    "EmbedAuthor",
+    "EmbedField",
+    "Embed",
+)
+
+
 # Tempted to put in a type field
-class _ViewableFile(_BaseModel):
+class _ViewableFile(BaseModel):
     url: str
     proxy_url: None | str
     height: None | int
@@ -51,7 +63,7 @@ class EmbedImage(_ViewableFile):
     }
 
 
-class EmbedFooter(_BaseModel):
+class EmbedFooter(BaseModel):
     # https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
 
     text: str
@@ -64,7 +76,7 @@ class EmbedFooter(_BaseModel):
     }
 
 
-class EmbedProvider(_BaseModel):
+class EmbedProvider(BaseModel):
     # https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
 
     name: str
@@ -76,7 +88,7 @@ class EmbedProvider(_BaseModel):
     }
 
 
-class EmbedAuthor(_BaseModel):
+class EmbedAuthor(BaseModel):
     # https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
 
     name: str
@@ -91,7 +103,7 @@ class EmbedAuthor(_BaseModel):
     }
 
 
-class EmbedField(_BaseModel):
+class EmbedField(BaseModel):
     # https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
 
     S = tuple["EmbedField", ...]
@@ -105,7 +117,7 @@ class EmbedField(_BaseModel):
     }
 
 
-class Embed(_BaseModel):
+class Embed(BaseModel):
     # https://discord.com/developers/docs/resources/channel#embed-object
 
     S = tuple["Embed", ...]

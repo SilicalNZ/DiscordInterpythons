@@ -5,14 +5,20 @@ from datetime import datetime
 from DiscordInterpythons.models.snowflake import GuildID, ChannelID, ScheduledEvent, Snowflake
 from DiscordInterpythons.models.model_type import PrivacyLevel, GuildScheduledEventStatus, GuildScheduledEventEntityType
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class GuildScheduledEventEntityMetadata(_BaseModel):
+__all__ = (
+    "GuildScheduledEventEntityMetadata",
+    "GuildScheduledEvent",
+)
+
+
+class GuildScheduledEventEntityMetadata(BaseModel):
     location: None | str
 
 
-class GuildScheduledEvent(_BaseModel):
+class GuildScheduledEvent(BaseModel):
     id: ScheduledEvent
     guild_id: GuildID
     channel_id: None | ChannelID

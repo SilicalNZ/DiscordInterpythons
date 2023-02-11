@@ -1,28 +1,35 @@
 from dataclasses import dataclass
-import json
 
 import aiohttp
 import asyncio
 
-from DiscordInterpythons.handlers import InteractionHandlerClass
-from DiscordInterpythons import models
+from DiscordInterpythons.handlers.handler import InteractionHandlerClass
+from DiscordInterpythons.models.snowflake import (
+    ApplicationID, 
+    GuildID,
+)
 from DiscordInterpythons.abcs import application_command as abc
-from DiscordInterpythons.providers._shared import Method
+from DiscordInterpythons.utils.http_method import Method
+
+
+__all__ = (
+    "ApplicationCommandAPI",
+)
 
 
 @dataclass
 class ApplicationCommandAPI(abc.ApplicationCommandABC):
     token: str
-    application_id: models.ApplicationID
-    debug_guild_id: None | models.GuildID
+    application_id: ApplicationID
+    debug_guild_id: None | GuildID
     local_application_commands: abc.ApplicationCommand.S
 
     @classmethod
     def from_interaction_handler_class(
             cls,
             token: str,
-            application_id: None | models.ApplicationID,
-            debug_guild_id: None | models.GuildID,
+            application_id: None | ApplicationID,
+            debug_guild_id: None | GuildID,
     ):
         return cls(
             token=token,

@@ -5,10 +5,17 @@ from typing import Sequence
 from DiscordInterpythons.models.snowflake import ApplicationCommandID, ApplicationID, GuildID, Version
 from DiscordInterpythons.models.model_type import ApplicationCommandType, Locale, ApplicationCommandOptionType, ChannelTypes
 from DiscordInterpythons.models.flag import Permissions
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 
 
-class ApplicationCommandOptionChoice(_BaseModel):
+__all__ = (
+    "ApplicationCommandOptionChoice",
+    "ApplicationCommandOption",
+    "ApplicationCommand",
+)
+
+
+class ApplicationCommandOptionChoice(BaseModel):
     # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
 
     S = tuple["ApplicationCommandOptionChoice", ...]
@@ -35,7 +42,7 @@ class ApplicationCommandOptionChoice(_BaseModel):
         return False
 
 
-class ApplicationCommandOption(_BaseModel):
+class ApplicationCommandOption(BaseModel):
     # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
 
     S = tuple["ApplicationCommandOption", ...]
@@ -124,7 +131,7 @@ class ApplicationCommandOption(_BaseModel):
         return False
 
 
-class ApplicationCommand(_BaseModel):
+class ApplicationCommand(BaseModel):
     # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
 
     S = tuple["ApplicationCommand", ...]

@@ -1,6 +1,34 @@
 from __future__ import annotations
 
 
+__all__ = (
+    "Snowflake",
+    "Snowflakes",
+    "AttachmentID",
+    "GuildID",
+    "ChannelID",
+    "VoiceRegionID",
+    "ThreadID",
+    "EmojiID",
+    "AFKChannelID",
+    "InteractionID",
+    "ApplicationID",
+    "UserID",
+    "MessageID",
+    "WebhookID",
+    "UserOrMessageID",
+    "RoleID",
+    "BotID",
+    "IntegrationID",
+    "UserOrRoleID",
+    "StickerID",
+    "StickerPackID",
+    "ApplicationCommandID",
+    "Version",
+    "ScheduledEvent",
+)
+
+
 class Snowflake(str):
     pass
 

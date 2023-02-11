@@ -5,12 +5,21 @@ from datetime import datetime
 from DiscordInterpythons.models.snowflake import ThreadID, GuildID, ChannelID, ApplicationID, WebhookID
 from DiscordInterpythons.models.flag import ChannelFlag
 from DiscordInterpythons.models.model_type import ChannelType, AutoArchiveDuration
-from DiscordInterpythons.models._shared import _BaseModel
+from DiscordInterpythons.utils.base import BaseModel
 from DiscordInterpythons.models.permission_overwrite import Permissions, PermissionOverwrite
 from DiscordInterpythons.models.user import UserID, User
 
 
-class ThreadMetaData(_BaseModel):
+__all__ = (
+    "ThreadMetaData",
+    "ThreadMember",
+    "ChannelMention",
+    "Channel",
+    "FollowedChannel",
+)
+
+
+class ThreadMetaData(BaseModel):
     # https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
 
     archived: bool
@@ -26,7 +35,7 @@ class ThreadMetaData(_BaseModel):
     }
 
 
-class ThreadMember(_BaseModel):
+class ThreadMember(BaseModel):
     # https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
 
     S = tuple["ThreadMember", ...]
@@ -37,7 +46,7 @@ class ThreadMember(_BaseModel):
     flags: int
 
 
-class ChannelMention(_BaseModel):
+class ChannelMention(BaseModel):
     # https://discord.com/developers/docs/resources/channel#channel-mention-object-channel-mention-structure
 
     S = tuple["ChannelMention", ...]
@@ -48,7 +57,7 @@ class ChannelMention(_BaseModel):
     name: str
 
 
-class Channel(_BaseModel):
+class Channel(BaseModel):
     # https://discord.com/developers/docs/resources/channel#channel-object
 
     S = tuple["Channel", ...]
@@ -111,6 +120,6 @@ class Channel(_BaseModel):
     }
 
 
-class FollowedChannel(_BaseModel):
+class FollowedChannel(BaseModel):
     channel_id: ChannelID
     webhook_id: WebhookID
