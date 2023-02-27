@@ -48,10 +48,6 @@ class Role(BaseModel):
     unicode_emoji: None | str
     tags: None | RoleTag.S
 
-    @property
-    def colour(self) -> int:
-        return self.color
-
     _omit = {
         "icon",
         "unicode_emoji",

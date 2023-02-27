@@ -93,13 +93,13 @@ class InteractionResponseHandler:
         )
 
     @classmethod
-    def reply(cls, content: str, colour: None | int = None) -> InteractionResponse:
+    def reply(cls, content: str, color: None | int = None) -> InteractionResponse:
         return InteractionResponse(
             type=InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data=InteractionCallbackData(
                 embeds=(Embed(
                     description=content,
-                    colour=colour,
+                    color=color,
                 ),)
             )
         )

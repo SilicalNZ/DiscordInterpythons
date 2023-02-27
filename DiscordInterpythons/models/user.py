@@ -32,10 +32,6 @@ class User(BaseModel):
     premium_type: None | UserPremiumTypes
     public_flags: None | UserFlags
 
-    @property
-    def accent_colour(self) -> None | bool:
-        return self.accent_color
-
     _omit = {
         "bot",
         "system",

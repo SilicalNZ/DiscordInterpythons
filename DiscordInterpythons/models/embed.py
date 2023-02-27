@@ -147,11 +147,7 @@ class Embed(BaseModel):
         "image",
         "thumbnail",
         "video",
-        "providers",
+        "provider",
         "author",
         "fields",
     }
-
-    @property
-    def colour(self) -> None | int:
-        return self.color
