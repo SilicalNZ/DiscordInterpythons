@@ -30,7 +30,7 @@ class UpdateMessageReq(BaseModel):
     allowed_mentions: None | AllowedMention = None
     components: None | tuple[ActionRow, ...] = None
     # files = None
-    payload_json: None | str = None
+    # payload_json: None | str = None
     attachments: None | Attachment.S = None
 
     _omit = {

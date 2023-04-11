@@ -62,7 +62,7 @@ class CreateChannelMessageReq(BaseModel):
     components: None | ActionRow.S
     sticker_ids: None | tuple[StickerID, ...]
     # files: None |
-    payload_json: None | str
+    # payload_json: None | str
     attachments: None | Attachment.S
     flags: None | MessageFlags
 

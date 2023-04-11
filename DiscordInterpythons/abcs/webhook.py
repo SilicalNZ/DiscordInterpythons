@@ -36,7 +36,7 @@ class ExecuteWebhookReq(BaseModel):
     allowed_mentions: None | AllowedMention = None
     components: None | ActionRow.S = None
     # files
-    payload_json: str
+    # payload_json: str
     attachments: None | Attachment.S = None
     flags: None | Permissions = None
     thread_name: None | str = None
@@ -62,7 +62,7 @@ class CreateFollowupReq(BaseModel):
     allowed_mentions: None | AllowedMention = None
     components: None | ActionRow.S = None
     # files
-    payload_json: str
+    # payload_json: str
     attachments: None | Attachment.S = None
     flags: None | Permissions = None
     thread_name: None | str = None
@@ -85,7 +85,7 @@ class UpdateWebhookMessageReq(BaseModel):
     allowed_mentions: None | AllowedMention = None
     components: None | ActionRow.S = None
     # files
-    payload_json: str
+    # payload_json: str
     attachments: None | Attachment.S = None
 
     _omit = {
