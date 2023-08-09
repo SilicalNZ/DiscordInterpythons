@@ -1,14 +1,13 @@
 import setuptools
 
 
-requirements = []
 with open("requirements.txt") as fp:
     requirements = fp.read().splitlines()
 
 
 setuptools.setup(
     name="DiscordInterpythons",
-    version="0.7.6",
+    version="0.7.7",
     license="Anyone may use this, but the origin (this project) must be credited",
     url="https://gihtub.com/SilicalNZ/DiscordInterpythons",
     description="A Pythonic wrapper for the Discord API specifically servicing Interaction Bots",

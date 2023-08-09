@@ -22,7 +22,7 @@ from DiscordInterpythons.models.interaction_data import InteractionDataOption
 from DiscordInterpythons.models.emoji import PartialEmoji
 from DiscordInterpythons.models.component import Button
 from DiscordInterpythons.models.user import User
-from DiscordInterpythons.models.channel import Channel
+from DiscordInterpythons.models.channel import PartialChannel
 from DiscordInterpythons.models.role import Role
 from DiscordInterpythons.models.attachment import Attachment
 
@@ -150,8 +150,16 @@ class ChatInputHandler(_Handler):
                     or option.type == ApplicationCommandOptionType.SUB_COMMAND
             ):
                 return await self._sub_commands[option.name]._call(interaction, option)
-
-            options[option.name] = option.value
+            elif option.type == ApplicationCommandOptionType.USER:
+                options[option.name] = interaction.data.resolved.roles[option.value]
+            elif option.type == ApplicationCommandOptionType.CHANNEL:
+                options[option.name] = interaction.data.resolved.channels[option.value]
+            elif option.type == ApplicationCommandOptionType.ROLE:
+                options[option.name] = interaction.data.resolved.roles[option.value]
+            elif option.type == ApplicationCommandOptionType.ATTACHMENT:
+                options[option.name] = interaction.data.resolved.attachments[option.value]
+            else:
+                options[option.name] = option.value
 
         return await self.application_command(self._parent_self, interaction, **options)
 
@@ -348,7 +356,7 @@ _application_command_option_map = {
     int: ApplicationCommandOptionType.INTEGER,
     bool: ApplicationCommandOptionType.BOOLEAN,
     User: ApplicationCommandOptionType.USER,
-    Channel: ApplicationCommandOptionType.CHANNEL,
+    PartialChannel: ApplicationCommandOptionType.CHANNEL,
     Role: ApplicationCommandOptionType.ROLE,
     float: ApplicationCommandOptionType.NUMBER,
     Attachment: ApplicationCommandOptionType.ATTACHMENT,

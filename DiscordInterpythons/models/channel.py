@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from DiscordInterpythons.models.snowflake import ThreadID, GuildID, ChannelID, ApplicationID, WebhookID
+from DiscordInterpythons.models.snowflake import ThreadID, GuildID, ChannelID, ApplicationID, WebhookID, MessageID
 from DiscordInterpythons.models.flag import ChannelFlag
 from DiscordInterpythons.models.model_type import ChannelType, AutoArchiveDuration
 from DiscordInterpythons.utils.base import BaseModel
@@ -15,6 +15,7 @@ __all__ = (
     "ThreadMember",
     "ChannelMention",
     "Channel",
+    "PartialChannel",
     "FollowedChannel",
 )
 
@@ -70,7 +71,7 @@ class Channel(BaseModel):
     name: None | str
     topic: None | str
     nsfw: None | str
-    last_message_id: None | bool
+    last_message_id: None | MessageID
     bitrate: None | int
     user_limit: None | int
     rate_limit_per_user: None | int
@@ -117,6 +118,40 @@ class Channel(BaseModel):
         "permissions",
         "flags",
         "total_message_sent",
+    }
+
+
+class PartialChannel(BaseModel):
+    # Undefined
+
+    id: ChannelID
+    type: ChannelType
+    guild_id: None | GuildID
+    position: None | int
+    name: None | str
+    topic: None | str
+    nsfw: None | str
+    last_message_id: None | MessageID
+    rate_limit_per_user: None | int
+    parent_id: None | ChannelID
+    last_pin_timestamp: datetime
+    permissions: Permissions
+    flags: None | ChannelFlag
+
+    _omit = {
+        "id",
+        "type",
+        "guild_id",
+        "position",
+        "name",
+        "topic",
+        "nsfw",
+        "last_message_id",
+        "rate_limit_per_user",
+        "parent_id",
+        "last_pin_timestamp",
+        "permissions",
+        "flags",
     }
 
 

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from DiscordInterpythons.models.model_type import ApplicationCommandType, ApplicationCommandOptionType, ComponentType
-from DiscordInterpythons.models.snowflake import ApplicationCommandID, UserOrMessageID, GuildID
+from DiscordInterpythons.models.snowflake import (
+    ApplicationCommandID, UserOrMessageID, GuildID, UserID, ChannelID, RoleID, MessageID, AttachmentID
+)
 from DiscordInterpythons.models.user import User
 from DiscordInterpythons.models.guild_member import GuildMember
 from DiscordInterpythons.models.role import Role
-from DiscordInterpythons.models.channel import Channel
+from DiscordInterpythons.models.channel import PartialChannel
 from DiscordInterpythons.models.message import Message
 from DiscordInterpythons.models.attachment import Attachment
 from DiscordInterpythons.utils.base import BaseModel
@@ -43,12 +45,12 @@ class InteractionDataOption(BaseModel):
 class InteractionResolvedData(BaseModel):
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
 
-    users: None | User.S
-    members: None | GuildMember.S
-    roles: None | Role.S
-    channels: None | Channel.S
-    messages: None | Message.S
-    attachments: None | Attachment.S
+    users: None | dict[UserID, User]
+    members: None | dict[UserID, GuildMember]
+    roles: None | dict[RoleID, Role]
+    channels: None | dict[ChannelID, PartialChannel]
+    messages: None | dict[MessageID, Message]
+    attachments: None | dict[AttachmentID, Attachment]
 
     _omit = {
         "users",
