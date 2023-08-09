@@ -8,6 +8,15 @@ __all__ = (
 
 
 class _BitField(int):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if any(isinstance(v, t) for t in (str, int)):
+            return cls(v)
+
     def bitwise_matches(self, match_against: int) -> bool:
         x = 1 << match_against
         return self & x == x

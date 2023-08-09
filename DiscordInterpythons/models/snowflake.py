@@ -30,7 +30,14 @@ __all__ = (
 
 
 class Snowflake(str):
-    pass
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if any(isinstance(v, t) for t in (str, int)):
+            return cls(v)
 
 
 Snowflakes = tuple[Snowflake, ...]
