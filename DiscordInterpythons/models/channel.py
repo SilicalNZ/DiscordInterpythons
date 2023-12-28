@@ -134,7 +134,7 @@ class PartialChannel(BaseModel):
     last_message_id: None | MessageID
     rate_limit_per_user: None | int
     parent_id: None | ChannelID
-    last_pin_timestamp: datetime
+    last_pin_timestamp: None | datetime
     permissions: Permissions
     flags: None | ChannelFlag
 
