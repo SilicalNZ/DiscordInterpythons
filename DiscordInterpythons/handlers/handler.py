@@ -17,7 +17,11 @@ from DiscordInterpythons.models.model_type import (
     ApplicationCommandType,
     ButtonStyleType,
 )
-from DiscordInterpythons.models.application_command import ApplicationCommand, ApplicationCommandOption
+from DiscordInterpythons.models.application_command import (
+    ApplicationCommand,
+    ApplicationCommandOption,
+    ApplicationCommandOptionChoice,
+)
 from DiscordInterpythons.models.interaction_data import InteractionDataOption
 from DiscordInterpythons.models.emoji import PartialEmoji
 from DiscordInterpythons.models.component import Button
@@ -186,9 +190,14 @@ class ChatInputHandler(_Handler):
                 annotation = union_items[1]
                 required = False
 
-            if issubclass(annotation, (enum.Enum, str)):
+            choices = None
+
+            if issubclass(annotation, str) and issubclass(annotation, enum.Enum):
+                choices = list(zip(annotation._member_names_, annotation._value2member_map_.keys()))
                 annotation = str
+
             elif issubclass(annotation, enum.Enum):
+                choices = list(zip(annotation._member_names_, annotation._value2member_map_.keys()))
                 annotation = int
 
             try:
@@ -207,6 +216,7 @@ class ChatInputHandler(_Handler):
                 type=option_type,
                 name=param,
                 description=param_description,
+                choices=tuple(ApplicationCommandOptionChoice(name=name, value=value) for name, value in choices) if choices is not None else None,
                 required=required,
                 autocomplete=(
                     param in self._auto_completes
