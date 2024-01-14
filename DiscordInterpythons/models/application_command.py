@@ -167,7 +167,7 @@ class ApplicationCommand(BaseModel):
 
         if other.description != self.description:
             return True
-        elif other.dm_permission != self.dm_permission:
+        elif self.dm_permission is not None and other.dm_permission != self.dm_permission:
             return True
         elif len(other.options or []) != len(self.options or []):
             return True

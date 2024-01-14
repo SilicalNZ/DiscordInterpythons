@@ -118,6 +118,7 @@ class ApplicationCommandAPI(abc.ApplicationCommandABC):
         for local_application_command in self.local_application_commands:
             if self._application_command_should_be_upserted(foreign_application_commands, local_application_command):
                 await self.create_or_update_application(local_application_command)
+                await asyncio.sleep(10)  # Arbitrary... should be something smarter
 
     def _foreign_application_command_should_be_deleted(self, application_command: abc.ApplicationCommand) -> bool:
         for local_application_command in self.local_application_commands:
