@@ -23,7 +23,7 @@ class User(BaseModel):
     bot: None | bool
     system: None | bool
     mfa_enabled: None | bool
-    banner: None | bool
+    banner: None | str
     accent_color: None | bool
     locale: None | Locale
     verified: None | str
