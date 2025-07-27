@@ -56,7 +56,7 @@ class ChannelAPI(ChannelABC):
             ) as resp:
                 if not (200 <= resp.status <= 299):
                     raise AssertionError(
-                        f"Code: {resp.status}, URL: {_BASE_URL}/channels/{self.channel_id}/{endpoint}, Response: {await resp.text()}")
+                        f"Code: {resp.status}, URL: {_BASE_URL}/channels/{self.channel_id}{endpoint}, Response: {await resp.text()}")
                 if respond:
                     return await resp.json()
                 return {}
